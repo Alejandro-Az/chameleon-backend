@@ -10,7 +10,9 @@ return new class extends Migration
     {
         Schema::create('appointment_staff_weekday_rules', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('appointment_staff_profile_id')->constrained('appointment_staff_profiles')->cascadeOnDelete();
+            $table->foreignId('appointment_staff_profile_id')
+                  ->constrained('appointment_staff_profiles', indexName: 'appt_staff_wkday_profile_fk')
+                  ->cascadeOnDelete();
             $table->unsignedTinyInteger('weekday');
             $table->boolean('is_active')->default(true);
             $table->time('start_time')->nullable();

@@ -11,7 +11,9 @@ return new class extends Migration
         Schema::create('appointment_staff_exceptions', function (Blueprint $table) {
             $table->id();
             $table->char('public_id', 26)->unique();
-            $table->foreignId('appointment_staff_profile_id')->constrained('appointment_staff_profiles')->cascadeOnDelete();
+            $table->foreignId('appointment_staff_profile_id')
+                  ->constrained('appointment_staff_profiles', indexName: 'appt_staff_exc_profile_fk')
+                  ->cascadeOnDelete();
             $table->string('name');
             $table->date('exception_date');
             $table->string('type', 32);
