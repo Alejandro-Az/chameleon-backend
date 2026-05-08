@@ -1,6 +1,6 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "kaanforge/kaan-core-backend",
+    "name": "camaleon/camaleon-backend",
     "type": "project",
     "description": "Kaan Core Backend — Reusable enterprise identity & security kernel built on Laravel 12.",
     "keywords": [
