@@ -5,7 +5,7 @@ return [
     'documentations' => [
         'default' => [
             'api' => [
-                'title' => 'L5 Swagger UI',
+                'title' => env('APP_NAME', 'Camaleon API'),
             ],
 
             'routes' => [
@@ -44,7 +44,7 @@ return [
                  * Absolute paths to directory containing the swagger annotations are stored.
                  */
                 'annotations' => [
-                    base_path('app/Docs'),
+                    base_path('app'),
                 ],
             ],
         ],
