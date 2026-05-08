@@ -16,35 +16,6 @@ class AuthController extends Controller
 {
     use \App\Traits\HasApiResponse;
 
-    /**
-     * @OA\Post(
-     *     path="/api/v1/auth/login",
-     *     tags={"Auth"},
-     *     summary="Login de usuario",
-     *     description="Retorna JWT. Soporta email o username según configuración.",
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"login","password"},
-     *             @OA\Property(property="login", type="string", example="admin@camaleon.dev",
-     *                 description="Email o username del usuario"),
-     *             @OA\Property(property="password", type="string", format="password", example="Secret123456")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=200,
-     *         description="Login exitoso",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="access_token", type="string", example="eyJ0eXAiOiJKV1Q..."),
-     *             @OA\Property(property="token_type", type="string", example="bearer"),
-     *             @OA\Property(property="expires_in", type="integer", example=3600)
-     *         )
-     *     ),
-     *     @OA\Response(response=401, description="Credenciales inválidas"),
-     *     @OA\Response(response=422, description="Validación fallida"),
-     *     @OA\Response(response=429, description="Demasiados intentos — rate limit")
-     * )
-     */
     public function login(Request $request, JwtSessionIssuer $issuer)
     {
         $request->validate([
@@ -146,27 +117,6 @@ class AuthController extends Controller
         ]));
     }
 
-    /**
-     * @OA\Get(
-     *     path="/api/v1/auth/me",
-     *     tags={"Auth"},
-     *     summary="Usuario autenticado",
-     *     security={{"bearerAuth":{}}},
-     *     @OA\Response(
-     *         response=200,
-     *         description="Datos del usuario",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="data", type="object",
-     *                 @OA\Property(property="id", type="string", example="01HXYZ..."),
-     *                 @OA\Property(property="name", type="string", example="Pablo Azuara"),
-     *                 @OA\Property(property="email", type="string", format="email"),
-     *                 @OA\Property(property="roles", type="array", @OA\Items(type="string", example="master"))
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(response=401, description="No autenticado")
-     * )
-     */
     public function me()
     {
         $user = auth('api')->user();
@@ -181,16 +131,6 @@ class AuthController extends Controller
         ]);
     }
 
-    /**
-     * @OA\Post(
-     *     path="/api/v1/auth/logout",
-     *     tags={"Auth"},
-     *     summary="Cerrar sesión",
-     *     security={{"bearerAuth":{}}},
-     *     @OA\Response(response=200, description="Sesión cerrada"),
-     *     @OA\Response(response=401, description="No autenticado")
-     * )
-     */
     public function logout(Request $request)
     {
         $user = auth('api')->user(); // Obtener usuario antes de invalidar
@@ -212,24 +152,6 @@ class AuthController extends Controller
         return $this->success(['message' => 'Sesión cerrada correctamente.']);
     }
 
-    /**
-     * @OA\Post(
-     *     path="/api/v1/auth/refresh",
-     *     tags={"Auth"},
-     *     summary="Refrescar token JWT",
-     *     security={{"bearerAuth":{}}},
-     *     @OA\Response(
-     *         response=200,
-     *         description="Nuevo token emitido",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="access_token", type="string"),
-     *             @OA\Property(property="token_type", type="string", example="bearer"),
-     *             @OA\Property(property="expires_in", type="integer", example=3600)
-     *         )
-     *     ),
-     *     @OA\Response(response=401, description="Token inválido o expirado")
-     * )
-     */
     public function refresh(Request $request, JwtSessionIssuer $issuer)
     {
         $user   = $request->user();

@@ -3741,6 +3741,758 @@
                 ]
             }
         },
+        "/api/v1/events/{slug}": {
+            "get": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Ver detalle de un evento (público)",
+                "operationId": "0399ad5e2aeaeb008bd08e7286b28f38",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "boda-ana-y-luis"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "slug": {
+                                                    "type": "string",
+                                                    "example": "boda-ana-y-luis"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Boda Ana y Luis"
+                                                },
+                                                "type": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "wedding",
+                                                        "xv",
+                                                        "graduation",
+                                                        "birthday",
+                                                        "other"
+                                                    ],
+                                                    "example": "wedding"
+                                                },
+                                                "date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2026-12-15"
+                                                },
+                                                "hero_path": {
+                                                    "type": "string",
+                                                    "example": "events/boda-ana-y-luis/hero.jpg",
+                                                    "nullable": true
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "published"
+                                                },
+                                                "template": {
+                                                    "properties": {
+                                                        "public_id": {
+                                                            "type": "string",
+                                                            "example": "01KHN2Y1XYWPBEPJGB1104GDZW"
+                                                        },
+                                                        "name": {
+                                                            "type": "string",
+                                                            "example": "Tuscan Garden"
+                                                        },
+                                                        "event_type": {
+                                                            "type": "string",
+                                                            "example": "wedding"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Actualizar evento",
+                "operationId": "d1c996aa3ffdd5683d5595739cb23ff0",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "boda-ana-y-luis"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Boda Ana y Luis Actualizada",
+                                        "nullable": true
+                                    },
+                                    "date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-12-20",
+                                        "nullable": true
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "draft",
+                                            "published",
+                                            "archived"
+                                        ],
+                                        "example": "published",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "slug": {
+                                                    "type": "string",
+                                                    "example": "boda-ana-y-luis"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Boda Ana y Luis Actualizada"
+                                                },
+                                                "date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2026-12-20"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "published"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Eliminar evento",
+                "operationId": "52bc3664cdf18eba912d96fd763504f5",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "boda-ana-y-luis"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/events": {
+            "get": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Listar eventos del usuario autenticado",
+                "operationId": "db404d021b2427caa62bd95305bea50f",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "slug": {
+                                                        "type": "string",
+                                                        "example": "boda-ana-y-luis"
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Boda Ana y Luis"
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "wedding",
+                                                            "xv",
+                                                            "graduation",
+                                                            "birthday",
+                                                            "other"
+                                                        ],
+                                                        "example": "wedding"
+                                                    },
+                                                    "date": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2026-12-15"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "draft"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Crear evento",
+                "operationId": "4b2d74efe3980df33b7a3f50a8c3a3eb",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "type",
+                                    "date"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Boda Ana y Luis"
+                                    },
+                                    "type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "wedding",
+                                            "xv",
+                                            "graduation",
+                                            "birthday",
+                                            "other"
+                                        ],
+                                        "example": "wedding"
+                                    },
+                                    "date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2026-12-15"
+                                    },
+                                    "template_id": {
+                                        "type": "integer",
+                                        "example": 1,
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "slug": {
+                                                    "type": "string",
+                                                    "example": "boda-ana-y-luis"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Boda Ana y Luis"
+                                                },
+                                                "type": {
+                                                    "type": "string",
+                                                    "example": "wedding"
+                                                },
+                                                "date": {
+                                                    "type": "string",
+                                                    "format": "date",
+                                                    "example": "2026-12-15"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "draft"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/events/{slug}/modules": {
+            "get": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Obtener módulos del evento",
+                "operationId": "e24fe0e62653d6afb0ec704e989f5d90",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "boda-ana-y-luis"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "module_key": {
+                                                        "type": "string",
+                                                        "example": "rsvp"
+                                                    },
+                                                    "enabled": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "order": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Actualizar módulos del evento",
+                "operationId": "e7a587aebbb1fd709239d296a58bf449",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "boda-ana-y-luis"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "modules"
+                                ],
+                                "properties": {
+                                    "modules": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "module_key",
+                                                "enabled",
+                                                "order"
+                                            ],
+                                            "properties": {
+                                                "module_key": {
+                                                    "type": "string",
+                                                    "enum": [
+                                                        "rsvp",
+                                                        "gifts",
+                                                        "songs",
+                                                        "schedule",
+                                                        "story",
+                                                        "dress_code",
+                                                        "gallery",
+                                                        "romantic_phrases",
+                                                        "attendance",
+                                                        "location"
+                                                    ],
+                                                    "example": "rsvp"
+                                                },
+                                                "enabled": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "order": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "module_key": {
+                                                        "type": "string",
+                                                        "example": "rsvp"
+                                                    },
+                                                    "enabled": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "order": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/health": {
             "get": {
                 "tags": [
@@ -3801,6 +4553,396 @@
                         }
                     }
                 }
+            }
+        },
+        "/api/v1/templates": {
+            "get": {
+                "tags": [
+                    "Templates"
+                ],
+                "summary": "Listar templates (público)",
+                "operationId": "d8597d6c4ef3281eff1f7ae3ae32b52f",
+                "parameters": [
+                    {
+                        "name": "event_type",
+                        "in": "query",
+                        "description": "Filtrar por tipo de evento",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "wedding",
+                                "xv",
+                                "graduation",
+                                "birthday",
+                                "other"
+                            ],
+                            "example": "wedding"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "public_id": {
+                                                        "type": "string",
+                                                        "example": "01KHN2Y1XYWPBEPJGB1104GDZW"
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Tuscan Garden"
+                                                    },
+                                                    "event_type": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "wedding",
+                                                            "xv",
+                                                            "graduation",
+                                                            "birthday",
+                                                            "other"
+                                                        ],
+                                                        "example": "wedding"
+                                                    },
+                                                    "default_module_order": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "string"
+                                                        },
+                                                        "example": [
+                                                            "rsvp",
+                                                            "schedule",
+                                                            "gifts",
+                                                            "gallery"
+                                                        ]
+                                                    },
+                                                    "styles": {
+                                                        "type": "object",
+                                                        "example": {
+                                                            "primary_color": "#e8d5b7",
+                                                            "font": "Cormorant"
+                                                        }
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Templates"
+                ],
+                "summary": "Crear template (solo admin)",
+                "operationId": "644eea38db008240e765e6c3c6731c81",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "event_type",
+                                    "default_module_order"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Rustic Chic"
+                                    },
+                                    "event_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "wedding",
+                                            "xv",
+                                            "graduation",
+                                            "birthday",
+                                            "other"
+                                        ],
+                                        "example": "wedding"
+                                    },
+                                    "default_module_order": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "rsvp",
+                                            "schedule",
+                                            "gifts",
+                                            "gallery"
+                                        ]
+                                    },
+                                    "styles": {
+                                        "type": "object",
+                                        "example": {
+                                            "primary_color": "#d4a373",
+                                            "font": "Playfair Display"
+                                        },
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "public_id": {
+                                                    "type": "string",
+                                                    "example": "01KHN2Y1XYWPBEPJGB1104GDZW"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Rustic Chic"
+                                                },
+                                                "event_type": {
+                                                    "type": "string",
+                                                    "example": "wedding"
+                                                },
+                                                "default_module_order": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "example": [
+                                                        "rsvp",
+                                                        "schedule",
+                                                        "gifts",
+                                                        "gallery"
+                                                    ]
+                                                },
+                                                "styles": {
+                                                    "type": "object",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso (requiere rol admin)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/templates/{public_id}": {
+            "put": {
+                "tags": [
+                    "Templates"
+                ],
+                "summary": "Actualizar template (solo admin)",
+                "operationId": "df2dc52f11588fcf20ceab4f07c2fad3",
+                "parameters": [
+                    {
+                        "name": "public_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "01KHN2Y1XYWPBEPJGB1104GDZW"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Rustic Chic V2",
+                                        "nullable": true
+                                    },
+                                    "default_module_order": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "rsvp",
+                                            "gifts",
+                                            "schedule",
+                                            "gallery"
+                                        ],
+                                        "nullable": true
+                                    },
+                                    "styles": {
+                                        "type": "object",
+                                        "example": {
+                                            "primary_color": "#c9a96e"
+                                        },
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "public_id": {
+                                                    "type": "string",
+                                                    "example": "01KHN2Y1XYWPBEPJGB1104GDZW"
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Rustic Chic V2"
+                                                },
+                                                "event_type": {
+                                                    "type": "string",
+                                                    "example": "wedding"
+                                                },
+                                                "default_module_order": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "example": [
+                                                        "rsvp",
+                                                        "gifts",
+                                                        "schedule",
+                                                        "gallery"
+                                                    ]
+                                                },
+                                                "styles": {
+                                                    "type": "object",
+                                                    "nullable": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso (requiere rol admin)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
             }
         }
     },
@@ -4693,8 +5835,16 @@
             "description": "Auth Sessions"
         },
         {
+            "name": "Events",
+            "description": "Events"
+        },
+        {
             "name": "Health",
             "description": "Health"
+        },
+        {
+            "name": "Templates",
+            "description": "Templates"
         }
     ]
 }
