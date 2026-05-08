@@ -8,6 +8,10 @@ namespace App\Http\Controllers;
  *     version="1.0.0",
  *     description="API REST de Camaleon — eventos sociales"
  * )
+ * @OA\Server(
+ *     url=L5_SWAGGER_CONST_HOST,
+ *     description="API Server"
+ * )
  * @OA\SecurityScheme(
  *     securityScheme="bearerAuth",
  *     type="http",
