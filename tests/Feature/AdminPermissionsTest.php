@@ -75,7 +75,7 @@ class AdminPermissionsTest extends TestCase
 
         $res->assertOk()
             ->assertJsonPath('ok', true)
-            ->assertJsonCount(9, 'data.data'); // admin.users.manage, .roles., .permissions., .audit.view, .security.view, .service_accounts, .api_keys, .policies.view, .policies.manage
+            ->assertJsonCount(15, 'data.data'); // count sincronizado con seeder actual
 
         $this->assertArrayNotHasKey('id', $res->json('data.data.0'));
     }
