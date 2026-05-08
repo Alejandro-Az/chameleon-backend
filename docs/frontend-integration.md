@@ -168,7 +168,66 @@ Regla de límites:
 
 ---
 
-## 4) Interceptores y Manejo de Errores
+## 4) Eventos y Templates (Camaleon)
+
+### Eventos
+
+Endpoints:
+- `GET /events/{slug}` (público)
+- `GET /events` (auth)
+- `POST /events` (auth)
+- `PUT /events/{slug}` (auth, owner)
+- `DELETE /events/{slug}` (auth, owner)
+- `GET /events/{slug}/modules` (auth, owner)
+- `PUT /events/{slug}/modules` (auth, owner)
+
+Reglas de payload importantes:
+- `type` (event): `wedding | quinceanera | graduation | birthday | party | other`
+- `date`: `nullable`; si se envía, debe ser fecha futura
+- `template_id`: string ULID del template (`public_id` interno)
+- `status` en update: `draft | published`
+
+Shape mínimo de evento en respuestas:
+
+```json
+{
+  "slug": "boda-ana-y-luis",
+  "name": "Boda Ana y Luis",
+  "type": "wedding",
+  "date": "2026-12-15",
+  "status": "draft",
+  "template": {
+    "id": "01KHN2Y1XYWPBEPJGB1104GDZW",
+    "name": "Tuscan Garden",
+    "event_type": "wedding"
+  }
+}
+```
+
+Notas de consumo:
+- En `DELETE /events/{slug}` la API responde `200` con `data: null`.
+- Para módulos de evento, `module_key` permitido: `rsvp | gifts | songs | schedule | story | dress_code | gallery | romantic_phrases | attendance | location`.
+
+### Templates
+
+Endpoints:
+- `GET /templates` (público)
+- `POST /templates` (auth + `role:admin`)
+- `PUT /templates/{id}` (auth + `role:admin`)
+
+Reglas de payload importantes:
+- `id` expuesto al frontend corresponde al `public_id` del template.
+- `event_type`: `wedding | quinceanera | graduation | birthday | party | other`
+- `styles` requerido en create (`POST /templates`):
+  - `primary_color` (`#RRGGBB`)
+  - `accent_color` (`#RRGGBB`)
+  - `font_serif`
+  - `font_sans`
+  - `bg_image_url` opcional
+
+---
+
+## 5) Interceptores y Manejo de Errores
 
 ### Errores que debes manejar siempre (must-handle)
 

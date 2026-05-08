@@ -58,7 +58,7 @@ php artisan migrate:fresh --seed       # Resetear DB con datos
 | `admin` | Superadmin del sistema |
 | `master` | Organizador del evento (cliente) |
 | `user` | Invitado autenticado |
-| público | Accede por slug sin auth (`/api/eventos/{slug}`) |
+| público | Accede por slug sin auth (`/api/v1/events/{slug}`) |
 
 ---
 
@@ -129,12 +129,26 @@ Cada módulo DEBE implementarse en este orden. No saltar pasos:
 
 ---
 
-### 🔲 Plan 1 — Módulos Fase 1: Auth base + Events CRUD (PENDIENTE)
+### 🟡 Plan 1 — Módulos Fase 1: Auth base + Events CRUD (EN PROGRESO AVANZADO)
 
 Módulos a implementar:
-- Adaptar/verificar Auth (login, registro, refresh token) para Camaleon
-- Events CRUD (ya existe estructura en kaan-core — adaptar y documentar con Swagger)
-- Rutas públicas de evento por slug
+- Adaptar/verificar Auth (login, registro, refresh token) para Camaleon ✅
+- Events CRUD (ya existe estructura en kaan-core — adaptar y documentar con Swagger) ✅
+- Rutas públicas de evento por slug ✅
+- Event modules (`GET/PUT /api/v1/events/{slug}/modules`) ✅
+- Templates (`GET/POST/PUT /api/v1/templates`) ✅
+
+Validaciones ejecutadas:
+
+- `php artisan test` → 217 passed
+- `php artisan l5-swagger:generate` → OK
+- `php artisan route:list --path=api/v1/events` → 7 rutas
+- `php artisan route:list --path=api/v1/templates` → 3 rutas
+
+Pendiente para cierre formal de plan:
+
+- Revisión final de documentación de integración frontend
+- Validación de consumo frontend sobre endpoints de Events/Templates en entorno integrado
 
 **Fuente de lógica legacy:**
 - `C:\xampp\htdocs\camaleon\app\Http\Controllers\Client\EventController.php`

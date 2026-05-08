@@ -16,7 +16,7 @@ final class TemplatesEndpoints
                 in: 'query',
                 required: false,
                 description: 'Filtrar por tipo de evento',
-                schema: new OA\Schema(type: 'string', enum: ['wedding', 'xv', 'graduation', 'birthday', 'other'], example: 'wedding')
+                schema: new OA\Schema(type: 'string', enum: ['wedding', 'quinceanera', 'graduation', 'birthday', 'party', 'other'], example: 'wedding')
             ),
         ],
         responses: [
@@ -31,16 +31,27 @@ final class TemplatesEndpoints
                             type: 'array',
                             items: new OA\Items(
                                 properties: [
-                                    new OA\Property(property: 'public_id', type: 'string', example: '01KHN2Y1XYWPBEPJGB1104GDZW'),
+                                    new OA\Property(property: 'id', type: 'string', example: '01KHN2Y1XYWPBEPJGB1104GDZW'),
                                     new OA\Property(property: 'name', type: 'string', example: 'Tuscan Garden'),
-                                    new OA\Property(property: 'event_type', type: 'string', enum: ['wedding', 'xv', 'graduation', 'birthday', 'other'], example: 'wedding'),
+                                    new OA\Property(property: 'event_type', type: 'string', enum: ['wedding', 'quinceanera', 'graduation', 'birthday', 'party', 'other'], example: 'wedding'),
                                     new OA\Property(
                                         property: 'default_module_order',
                                         type: 'array',
                                         items: new OA\Items(type: 'string'),
                                         example: ['rsvp', 'schedule', 'gifts', 'gallery']
                                     ),
-                                    new OA\Property(property: 'styles', type: 'object', example: ['primary_color' => '#e8d5b7', 'font' => 'Cormorant']),
+                                    new OA\Property(
+                                        property: 'styles',
+                                        type: 'object',
+                                        nullable: true,
+                                        properties: [
+                                            new OA\Property(property: 'primary_color', type: 'string', example: '#e8d5b7'),
+                                            new OA\Property(property: 'accent_color', type: 'string', example: '#d6b07f'),
+                                            new OA\Property(property: 'font_serif', type: 'string', example: 'Cormorant Garamond'),
+                                            new OA\Property(property: 'font_sans', type: 'string', example: 'Montserrat'),
+                                            new OA\Property(property: 'bg_image_url', type: 'string', nullable: true, example: 'https://example.com/bg.jpg'),
+                                        ]
+                                    ),
                                 ]
                             )
                         ),
@@ -59,17 +70,28 @@ final class TemplatesEndpoints
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ['name', 'event_type', 'default_module_order'],
+                required: ['name', 'event_type', 'default_module_order', 'styles'],
                 properties: [
                     new OA\Property(property: 'name', type: 'string', example: 'Rustic Chic'),
-                    new OA\Property(property: 'event_type', type: 'string', enum: ['wedding', 'xv', 'graduation', 'birthday', 'other'], example: 'wedding'),
+                    new OA\Property(property: 'event_type', type: 'string', enum: ['wedding', 'quinceanera', 'graduation', 'birthday', 'party', 'other'], example: 'wedding'),
                     new OA\Property(
                         property: 'default_module_order',
                         type: 'array',
                         items: new OA\Items(type: 'string'),
                         example: ['rsvp', 'schedule', 'gifts', 'gallery']
                     ),
-                    new OA\Property(property: 'styles', type: 'object', nullable: true, example: ['primary_color' => '#d4a373', 'font' => 'Playfair Display']),
+                    new OA\Property(
+                        property: 'styles',
+                        type: 'object',
+                        required: ['primary_color', 'accent_color', 'font_serif', 'font_sans'],
+                        properties: [
+                            new OA\Property(property: 'primary_color', type: 'string', example: '#d4a373'),
+                            new OA\Property(property: 'accent_color', type: 'string', example: '#f4a261'),
+                            new OA\Property(property: 'font_serif', type: 'string', example: 'Playfair Display'),
+                            new OA\Property(property: 'font_sans', type: 'string', example: 'Lato'),
+                            new OA\Property(property: 'bg_image_url', type: 'string', nullable: true, example: 'https://example.com/bg.jpg'),
+                        ]
+                    ),
                 ]
             )
         ),
@@ -84,7 +106,7 @@ final class TemplatesEndpoints
                             property: 'data',
                             type: 'object',
                             properties: [
-                                new OA\Property(property: 'public_id', type: 'string', example: '01KHN2Y1XYWPBEPJGB1104GDZW'),
+                                new OA\Property(property: 'id', type: 'string', example: '01KHN2Y1XYWPBEPJGB1104GDZW'),
                                 new OA\Property(property: 'name', type: 'string', example: 'Rustic Chic'),
                                 new OA\Property(property: 'event_type', type: 'string', example: 'wedding'),
                                 new OA\Property(
@@ -93,7 +115,18 @@ final class TemplatesEndpoints
                                     items: new OA\Items(type: 'string'),
                                     example: ['rsvp', 'schedule', 'gifts', 'gallery']
                                 ),
-                                new OA\Property(property: 'styles', type: 'object', nullable: true),
+                                new OA\Property(
+                                    property: 'styles',
+                                    type: 'object',
+                                    nullable: true,
+                                    properties: [
+                                        new OA\Property(property: 'primary_color', type: 'string', example: '#d4a373'),
+                                        new OA\Property(property: 'accent_color', type: 'string', example: '#f4a261'),
+                                        new OA\Property(property: 'font_serif', type: 'string', example: 'Playfair Display'),
+                                        new OA\Property(property: 'font_sans', type: 'string', example: 'Lato'),
+                                        new OA\Property(property: 'bg_image_url', type: 'string', nullable: true, example: 'https://example.com/bg.jpg'),
+                                    ]
+                                ),
                             ]
                         ),
                     ]
@@ -107,12 +140,12 @@ final class TemplatesEndpoints
     public function store(): void {}
 
     #[OA\Put(
-        path: '/api/v1/templates/{public_id}',
+        path: '/api/v1/templates/{id}',
         tags: ['Templates'],
         summary: 'Actualizar template (solo admin)',
         security: [['bearerAuth' => []]],
         parameters: [
-            new OA\Parameter(name: 'public_id', in: 'path', required: true, schema: new OA\Schema(type: 'string', example: '01KHN2Y1XYWPBEPJGB1104GDZW')),
+            new OA\Parameter(name: 'id', in: 'path', required: true, schema: new OA\Schema(type: 'string', example: '01KHN2Y1XYWPBEPJGB1104GDZW')),
         ],
         requestBody: new OA\RequestBody(
             required: false,
@@ -141,7 +174,7 @@ final class TemplatesEndpoints
                             property: 'data',
                             type: 'object',
                             properties: [
-                                new OA\Property(property: 'public_id', type: 'string', example: '01KHN2Y1XYWPBEPJGB1104GDZW'),
+                                new OA\Property(property: 'id', type: 'string', example: '01KHN2Y1XYWPBEPJGB1104GDZW'),
                                 new OA\Property(property: 'name', type: 'string', example: 'Rustic Chic V2'),
                                 new OA\Property(property: 'event_type', type: 'string', example: 'wedding'),
                                 new OA\Property(
@@ -150,7 +183,18 @@ final class TemplatesEndpoints
                                     items: new OA\Items(type: 'string'),
                                     example: ['rsvp', 'gifts', 'schedule', 'gallery']
                                 ),
-                                new OA\Property(property: 'styles', type: 'object', nullable: true),
+                                new OA\Property(
+                                    property: 'styles',
+                                    type: 'object',
+                                    nullable: true,
+                                    properties: [
+                                        new OA\Property(property: 'primary_color', type: 'string', example: '#c9a96e'),
+                                        new OA\Property(property: 'accent_color', type: 'string', example: '#f4a261'),
+                                        new OA\Property(property: 'font_serif', type: 'string', example: 'Playfair Display'),
+                                        new OA\Property(property: 'font_sans', type: 'string', example: 'Lato'),
+                                        new OA\Property(property: 'bg_image_url', type: 'string', nullable: true, example: 'https://example.com/bg.jpg'),
+                                    ]
+                                ),
                             ]
                         ),
                     ]

@@ -26,15 +26,15 @@ final class EventsEndpoints
                             properties: [
                                 new OA\Property(property: 'slug', type: 'string', example: 'boda-ana-y-luis'),
                                 new OA\Property(property: 'name', type: 'string', example: 'Boda Ana y Luis'),
-                                new OA\Property(property: 'type', type: 'string', enum: ['wedding', 'xv', 'graduation', 'birthday', 'other'], example: 'wedding'),
-                                new OA\Property(property: 'date', type: 'string', format: 'date', example: '2026-12-15'),
+                                new OA\Property(property: 'type', type: 'string', enum: ['wedding', 'quinceanera', 'graduation', 'birthday', 'party', 'other'], example: 'wedding'),
+                                new OA\Property(property: 'date', type: 'string', format: 'date', nullable: true, example: '2026-12-15'),
                                 new OA\Property(property: 'hero_path', type: 'string', nullable: true, example: 'events/boda-ana-y-luis/hero.jpg'),
                                 new OA\Property(property: 'status', type: 'string', example: 'published'),
                                 new OA\Property(
                                     property: 'template',
                                     type: 'object',
                                     properties: [
-                                        new OA\Property(property: 'public_id', type: 'string', example: '01KHN2Y1XYWPBEPJGB1104GDZW'),
+                                        new OA\Property(property: 'id', type: 'string', example: '01KHN2Y1XYWPBEPJGB1104GDZW'),
                                         new OA\Property(property: 'name', type: 'string', example: 'Tuscan Garden'),
                                         new OA\Property(property: 'event_type', type: 'string', example: 'wedding'),
                                     ]
@@ -68,8 +68,8 @@ final class EventsEndpoints
                                 properties: [
                                     new OA\Property(property: 'slug', type: 'string', example: 'boda-ana-y-luis'),
                                     new OA\Property(property: 'name', type: 'string', example: 'Boda Ana y Luis'),
-                                    new OA\Property(property: 'type', type: 'string', enum: ['wedding', 'xv', 'graduation', 'birthday', 'other'], example: 'wedding'),
-                                    new OA\Property(property: 'date', type: 'string', format: 'date', example: '2026-12-15'),
+                                    new OA\Property(property: 'type', type: 'string', enum: ['wedding', 'quinceanera', 'graduation', 'birthday', 'party', 'other'], example: 'wedding'),
+                                    new OA\Property(property: 'date', type: 'string', format: 'date', nullable: true, example: '2026-12-15'),
                                     new OA\Property(property: 'status', type: 'string', example: 'draft'),
                                 ]
                             )
@@ -90,12 +90,12 @@ final class EventsEndpoints
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ['name', 'type', 'date'],
+                required: ['name', 'type'],
                 properties: [
                     new OA\Property(property: 'name', type: 'string', example: 'Boda Ana y Luis'),
-                    new OA\Property(property: 'type', type: 'string', enum: ['wedding', 'xv', 'graduation', 'birthday', 'other'], example: 'wedding'),
-                    new OA\Property(property: 'date', type: 'string', format: 'date', example: '2026-12-15'),
-                    new OA\Property(property: 'template_id', type: 'integer', nullable: true, example: 1),
+                    new OA\Property(property: 'type', type: 'string', enum: ['wedding', 'quinceanera', 'graduation', 'birthday', 'party', 'other'], example: 'wedding'),
+                    new OA\Property(property: 'date', type: 'string', format: 'date', nullable: true, example: '2026-12-15'),
+                    new OA\Property(property: 'template_id', type: 'string', nullable: true, example: '01KHN2Y1XYWPBEPJGB1104GDZW'),
                 ]
             )
         ),
@@ -113,7 +113,7 @@ final class EventsEndpoints
                                 new OA\Property(property: 'slug', type: 'string', example: 'boda-ana-y-luis'),
                                 new OA\Property(property: 'name', type: 'string', example: 'Boda Ana y Luis'),
                                 new OA\Property(property: 'type', type: 'string', example: 'wedding'),
-                                new OA\Property(property: 'date', type: 'string', format: 'date', example: '2026-12-15'),
+                                new OA\Property(property: 'date', type: 'string', format: 'date', nullable: true, example: '2026-12-15'),
                                 new OA\Property(property: 'status', type: 'string', example: 'draft'),
                             ]
                         ),
@@ -140,7 +140,8 @@ final class EventsEndpoints
                 properties: [
                     new OA\Property(property: 'name', type: 'string', nullable: true, example: 'Boda Ana y Luis Actualizada'),
                     new OA\Property(property: 'date', type: 'string', format: 'date', nullable: true, example: '2026-12-20'),
-                    new OA\Property(property: 'status', type: 'string', nullable: true, enum: ['draft', 'published', 'archived'], example: 'published'),
+                    new OA\Property(property: 'status', type: 'string', nullable: true, enum: ['draft', 'published'], example: 'published'),
+                    new OA\Property(property: 'template_id', type: 'string', nullable: true, example: '01KHN2Y1XYWPBEPJGB1104GDZW'),
                 ]
             )
         ),
@@ -157,7 +158,7 @@ final class EventsEndpoints
                             properties: [
                                 new OA\Property(property: 'slug', type: 'string', example: 'boda-ana-y-luis'),
                                 new OA\Property(property: 'name', type: 'string', example: 'Boda Ana y Luis Actualizada'),
-                                new OA\Property(property: 'date', type: 'string', format: 'date', example: '2026-12-20'),
+                                new OA\Property(property: 'date', type: 'string', format: 'date', nullable: true, example: '2026-12-20'),
                                 new OA\Property(property: 'status', type: 'string', example: 'published'),
                             ]
                         ),
@@ -187,6 +188,7 @@ final class EventsEndpoints
                 content: new OA\JsonContent(
                     properties: [
                         new OA\Property(property: 'ok', type: 'boolean', example: true),
+                        new OA\Property(property: 'data', nullable: true, example: null),
                     ]
                 )
             ),

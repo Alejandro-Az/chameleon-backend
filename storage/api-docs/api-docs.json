@@ -3784,9 +3784,10 @@
                                                     "type": "string",
                                                     "enum": [
                                                         "wedding",
-                                                        "xv",
+                                                        "quinceanera",
                                                         "graduation",
                                                         "birthday",
+                                                        "party",
                                                         "other"
                                                     ],
                                                     "example": "wedding"
@@ -3794,7 +3795,8 @@
                                                 "date": {
                                                     "type": "string",
                                                     "format": "date",
-                                                    "example": "2026-12-15"
+                                                    "example": "2026-12-15",
+                                                    "nullable": true
                                                 },
                                                 "hero_path": {
                                                     "type": "string",
@@ -3807,7 +3809,7 @@
                                                 },
                                                 "template": {
                                                     "properties": {
-                                                        "public_id": {
+                                                        "id": {
                                                             "type": "string",
                                                             "example": "01KHN2Y1XYWPBEPJGB1104GDZW"
                                                         },
@@ -3881,10 +3883,14 @@
                                         "type": "string",
                                         "enum": [
                                             "draft",
-                                            "published",
-                                            "archived"
+                                            "published"
                                         ],
                                         "example": "published",
+                                        "nullable": true
+                                    },
+                                    "template_id": {
+                                        "type": "string",
+                                        "example": "01KHN2Y1XYWPBEPJGB1104GDZW",
                                         "nullable": true
                                     }
                                 },
@@ -3917,7 +3923,8 @@
                                                 "date": {
                                                     "type": "string",
                                                     "format": "date",
-                                                    "example": "2026-12-20"
+                                                    "example": "2026-12-20",
+                                                    "nullable": true
                                                 },
                                                 "status": {
                                                     "type": "string",
@@ -4006,6 +4013,10 @@
                                         "ok": {
                                             "type": "boolean",
                                             "example": true
+                                        },
+                                        "data": {
+                                            "example": null,
+                                            "nullable": true
                                         }
                                     },
                                     "type": "object"
@@ -4085,9 +4096,10 @@
                                                         "type": "string",
                                                         "enum": [
                                                             "wedding",
-                                                            "xv",
+                                                            "quinceanera",
                                                             "graduation",
                                                             "birthday",
+                                                            "party",
                                                             "other"
                                                         ],
                                                         "example": "wedding"
@@ -4095,7 +4107,8 @@
                                                     "date": {
                                                         "type": "string",
                                                         "format": "date",
-                                                        "example": "2026-12-15"
+                                                        "example": "2026-12-15",
+                                                        "nullable": true
                                                     },
                                                     "status": {
                                                         "type": "string",
@@ -4141,8 +4154,7 @@
                             "schema": {
                                 "required": [
                                     "name",
-                                    "type",
-                                    "date"
+                                    "type"
                                 ],
                                 "properties": {
                                     "name": {
@@ -4153,9 +4165,10 @@
                                         "type": "string",
                                         "enum": [
                                             "wedding",
-                                            "xv",
+                                            "quinceanera",
                                             "graduation",
                                             "birthday",
+                                            "party",
                                             "other"
                                         ],
                                         "example": "wedding"
@@ -4163,11 +4176,12 @@
                                     "date": {
                                         "type": "string",
                                         "format": "date",
-                                        "example": "2026-12-15"
+                                        "example": "2026-12-15",
+                                        "nullable": true
                                     },
                                     "template_id": {
-                                        "type": "integer",
-                                        "example": 1,
+                                        "type": "string",
+                                        "example": "01KHN2Y1XYWPBEPJGB1104GDZW",
                                         "nullable": true
                                     }
                                 },
@@ -4204,7 +4218,8 @@
                                                 "date": {
                                                     "type": "string",
                                                     "format": "date",
-                                                    "example": "2026-12-15"
+                                                    "example": "2026-12-15",
+                                                    "nullable": true
                                                 },
                                                 "status": {
                                                     "type": "string",
@@ -4572,9 +4587,10 @@
                             "type": "string",
                             "enum": [
                                 "wedding",
-                                "xv",
+                                "quinceanera",
                                 "graduation",
                                 "birthday",
+                                "party",
                                 "other"
                             ],
                             "example": "wedding"
@@ -4596,7 +4612,7 @@
                                             "type": "array",
                                             "items": {
                                                 "properties": {
-                                                    "public_id": {
+                                                    "id": {
                                                         "type": "string",
                                                         "example": "01KHN2Y1XYWPBEPJGB1104GDZW"
                                                     },
@@ -4608,9 +4624,10 @@
                                                         "type": "string",
                                                         "enum": [
                                                             "wedding",
-                                                            "xv",
+                                                            "quinceanera",
                                                             "graduation",
                                                             "birthday",
+                                                            "party",
                                                             "other"
                                                         ],
                                                         "example": "wedding"
@@ -4628,11 +4645,31 @@
                                                         ]
                                                     },
                                                     "styles": {
+                                                        "properties": {
+                                                            "primary_color": {
+                                                                "type": "string",
+                                                                "example": "#e8d5b7"
+                                                            },
+                                                            "accent_color": {
+                                                                "type": "string",
+                                                                "example": "#d6b07f"
+                                                            },
+                                                            "font_serif": {
+                                                                "type": "string",
+                                                                "example": "Cormorant Garamond"
+                                                            },
+                                                            "font_sans": {
+                                                                "type": "string",
+                                                                "example": "Montserrat"
+                                                            },
+                                                            "bg_image_url": {
+                                                                "type": "string",
+                                                                "example": "https://example.com/bg.jpg",
+                                                                "nullable": true
+                                                            }
+                                                        },
                                                         "type": "object",
-                                                        "example": {
-                                                            "primary_color": "#e8d5b7",
-                                                            "font": "Cormorant"
-                                                        }
+                                                        "nullable": true
                                                     }
                                                 },
                                                 "type": "object"
@@ -4660,7 +4697,8 @@
                                 "required": [
                                     "name",
                                     "event_type",
-                                    "default_module_order"
+                                    "default_module_order",
+                                    "styles"
                                 ],
                                 "properties": {
                                     "name": {
@@ -4671,9 +4709,10 @@
                                         "type": "string",
                                         "enum": [
                                             "wedding",
-                                            "xv",
+                                            "quinceanera",
                                             "graduation",
                                             "birthday",
+                                            "party",
                                             "other"
                                         ],
                                         "example": "wedding"
@@ -4691,12 +4730,36 @@
                                         ]
                                     },
                                     "styles": {
-                                        "type": "object",
-                                        "example": {
-                                            "primary_color": "#d4a373",
-                                            "font": "Playfair Display"
+                                        "required": [
+                                            "primary_color",
+                                            "accent_color",
+                                            "font_serif",
+                                            "font_sans"
+                                        ],
+                                        "properties": {
+                                            "primary_color": {
+                                                "type": "string",
+                                                "example": "#d4a373"
+                                            },
+                                            "accent_color": {
+                                                "type": "string",
+                                                "example": "#f4a261"
+                                            },
+                                            "font_serif": {
+                                                "type": "string",
+                                                "example": "Playfair Display"
+                                            },
+                                            "font_sans": {
+                                                "type": "string",
+                                                "example": "Lato"
+                                            },
+                                            "bg_image_url": {
+                                                "type": "string",
+                                                "example": "https://example.com/bg.jpg",
+                                                "nullable": true
+                                            }
                                         },
-                                        "nullable": true
+                                        "type": "object"
                                     }
                                 },
                                 "type": "object"
@@ -4717,7 +4780,7 @@
                                         },
                                         "data": {
                                             "properties": {
-                                                "public_id": {
+                                                "id": {
                                                     "type": "string",
                                                     "example": "01KHN2Y1XYWPBEPJGB1104GDZW"
                                                 },
@@ -4742,6 +4805,29 @@
                                                     ]
                                                 },
                                                 "styles": {
+                                                    "properties": {
+                                                        "primary_color": {
+                                                            "type": "string",
+                                                            "example": "#d4a373"
+                                                        },
+                                                        "accent_color": {
+                                                            "type": "string",
+                                                            "example": "#f4a261"
+                                                        },
+                                                        "font_serif": {
+                                                            "type": "string",
+                                                            "example": "Playfair Display"
+                                                        },
+                                                        "font_sans": {
+                                                            "type": "string",
+                                                            "example": "Lato"
+                                                        },
+                                                        "bg_image_url": {
+                                                            "type": "string",
+                                                            "example": "https://example.com/bg.jpg",
+                                                            "nullable": true
+                                                        }
+                                                    },
                                                     "type": "object",
                                                     "nullable": true
                                                 }
@@ -4792,16 +4878,16 @@
                 ]
             }
         },
-        "/api/v1/templates/{public_id}": {
+        "/api/v1/templates/{id}": {
             "put": {
                 "tags": [
                     "Templates"
                 ],
                 "summary": "Actualizar template (solo admin)",
-                "operationId": "df2dc52f11588fcf20ceab4f07c2fad3",
+                "operationId": "169e695e506bb622419699a7a9d2260b",
                 "parameters": [
                     {
-                        "name": "public_id",
+                        "name": "id",
                         "in": "path",
                         "required": true,
                         "schema": {
@@ -4860,7 +4946,7 @@
                                         },
                                         "data": {
                                             "properties": {
-                                                "public_id": {
+                                                "id": {
                                                     "type": "string",
                                                     "example": "01KHN2Y1XYWPBEPJGB1104GDZW"
                                                 },
@@ -4885,6 +4971,29 @@
                                                     ]
                                                 },
                                                 "styles": {
+                                                    "properties": {
+                                                        "primary_color": {
+                                                            "type": "string",
+                                                            "example": "#c9a96e"
+                                                        },
+                                                        "accent_color": {
+                                                            "type": "string",
+                                                            "example": "#f4a261"
+                                                        },
+                                                        "font_serif": {
+                                                            "type": "string",
+                                                            "example": "Playfair Display"
+                                                        },
+                                                        "font_sans": {
+                                                            "type": "string",
+                                                            "example": "Lato"
+                                                        },
+                                                        "bg_image_url": {
+                                                            "type": "string",
+                                                            "example": "https://example.com/bg.jpg",
+                                                            "nullable": true
+                                                        }
+                                                    },
                                                     "type": "object",
                                                     "nullable": true
                                                 }

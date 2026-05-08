@@ -2,6 +2,32 @@
 
 Todas las modificaciones importantes de este proyecto se documentan en este archivo. El formato se basa en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.2-alpha] - 2026-05-08
+
+Cierre de drift documental para el módulo Camaleon (Auth + Events + Templates) y sincronización de estado de avance.
+
+### Cambiado
+- Swagger de Events alineado con runtime:
+    - `type` actualizado a `wedding | quinceanera | graduation | birthday | party | other`.
+    - `date` documentado como `nullable` en create/update/responses.
+    - `template_id` documentado como string ULID (`public_id`), no entero.
+    - `status` de update alineado a `draft | published`.
+    - response de delete documentado con `data: null`.
+- Swagger de Templates alineado con runtime:
+    - payload expuesto con `id` (identificador público), no `public_id`.
+    - `event_type` actualizado a enums vigentes.
+    - estructura real de `styles` documentada.
+    - `styles` marcado como requerido en create.
+- `CONTRACTS.md` (raíz) sincronizado con contratos reales consumibles por frontend para:
+    - Auth (`login`, `refresh`, `me`, `logout`)
+    - Events (público + CRUD + modules)
+    - Templates (público + admin create/update)
+- `ESTADO.md` actualizado al avance real de Plan 1 y rutas actuales (`/api/v1/events/{slug}`).
+
+### Verificado
+- `php artisan l5-swagger:generate` OK.
+- `php artisan test` OK (`217 passed`).
+
 ## [0.2.1-alpha] - 2026-03-16
 
 Consolidación contractual del módulo de Roles y formalización de políticas documentales de release.
