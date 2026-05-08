@@ -1,0 +1,4700 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Kaan Core Backend API",
+        "description": "API base reutilizable (Auth v1 + Sessions enforcement + Admin Users).",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://127.0.0.1:8000",
+            "description": "Local"
+        }
+    ],
+    "paths": {
+        "/api/v1/admin/service-accounts/{serviceAccount}/api-keys": {
+            "get": {
+                "tags": [
+                    "Admin - API Keys"
+                ],
+                "summary": "Listar API keys de un service account",
+                "operationId": "344333abe3a7806274b1e24205dbc6b5",
+                "parameters": [
+                    {
+                        "name": "serviceAccount",
+                        "in": "path",
+                        "description": "public_id (ULID) del service account",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "01J3Q8XJQZ1W2W1V9D3B2C7K8N"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page (hard cap 1000; real max governed by policy api.pagination.max_per_page)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 1000,
+                            "minimum": 1,
+                            "example": 15
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "ERP"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "description": "active|revoked|expired",
+                            "type": "string",
+                            "example": "active"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/PaginatedApiKeys"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Service account no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin - API Keys"
+                ],
+                "summary": "Crear API key para un service account (retorna secreto one-time)",
+                "operationId": "f38ad2013d50d863d9e97d540bcc24fe",
+                "parameters": [
+                    {
+                        "name": "serviceAccount",
+                        "in": "path",
+                        "description": "public_id (ULID) del service account",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "01J3Q8XJQZ1W2W1V9D3B2C7K8N"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "ERP Sync Key"
+                                    },
+                                    "scopes": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "read:users",
+                                            "write:orders"
+                                        ],
+                                        "nullable": true
+                                    },
+                                    "expires_at": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2026-06-01T00:00:00Z",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created (retorna secreto one-time)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "api_key": {
+                                                    "$ref": "#/components/schemas/ApiKey"
+                                                },
+                                                "secret": {
+                                                    "description": "Secreto one-time (no se puede recuperar después)",
+                                                    "type": "string",
+                                                    "example": "kk_live_f2J9kYx..."
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Service account no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/api-keys/{apiKey}/rotate": {
+            "post": {
+                "tags": [
+                    "Admin - API Keys"
+                ],
+                "summary": "Rotar API key (revoca anterior y retorna nuevo secreto one-time)",
+                "operationId": "c443e0bc7a5403d3a715cc9bb914c667",
+                "parameters": [
+                    {
+                        "name": "apiKey",
+                        "in": "path",
+                        "description": "public_id (ULID) de la API key",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "01J3Q90Z2YYQZ2D8JH2KX8ZQ0R"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK (retorna nuevo secreto one-time)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "api_key": {
+                                                    "$ref": "#/components/schemas/ApiKey"
+                                                },
+                                                "secret": {
+                                                    "description": "Secreto one-time (no se puede recuperar después)",
+                                                    "type": "string",
+                                                    "example": "kk_live_9KxL1p..."
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "API key no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/api-keys/{apiKey}": {
+            "delete": {
+                "tags": [
+                    "Admin - API Keys"
+                ],
+                "summary": "Revocar API key (idempotente)",
+                "operationId": "1fc10119f771378ead26d96c9c53f831",
+                "parameters": [
+                    {
+                        "name": "apiKey",
+                        "in": "path",
+                        "description": "public_id (ULID) de la API key",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "01J3Q90Z2YYQZ2D8JH2KX8ZQ0R"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "API key revocada correctamente."
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "API key no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/audit-logs": {
+            "get": {
+                "tags": [
+                    "Admin Audit Logs"
+                ],
+                "summary": "Listar Audit Logs del sistema",
+                "description": "Retorna un listado paginado de los logs de auditoria del sistema. Requiere permiso `admin.audit.view`.",
+                "operationId": "4c8662589aa734eef8ad32ced49f897e",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "query",
+                        "description": "Filtrar por ULID público del usuario autor del log",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "action",
+                        "in": "query",
+                        "description": "Filtrar de manera exacta por nombre de la acción (e.g `auth.login`)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "description": "Fecha de inicio del filtro",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "description": "Fecha de fin del filtro",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Búsqueda de texto en el nombre de la acción o en el email y el nombre de los usuarios",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Elementos por página (max. 1000)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedAuditLogs"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "No autorizado (falta permiso)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/dashboard/summary": {
+            "get": {
+                "tags": [
+                    "Admin - Dashboard"
+                ],
+                "summary": "Resumen del dashboard administrativo",
+                "description": "Retorna métricas del sistema y actividad reciente. El contenido de `data.metrics` y `data.recent_activity` depende de los permisos granulares del usuario autenticado: `admin.users.manage`, `admin.roles.manage`, `admin.security.view`, `admin.audit.view`. No requiere un permiso fijo — cualquier usuario activo y verificado puede llamar al endpoint; la respuesta se filtra automáticamente.",
+                "operationId": "219f78e1a493bac7e12d9e64a7f79f30",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "description": "Contenido variable según permisos del usuario autenticado.",
+                                            "properties": {
+                                                "metrics": {
+                                                    "description": "Métricas del sistema. Cada clave aparece solo si el usuario tiene el permiso correspondiente.",
+                                                    "properties": {
+                                                        "users": {
+                                                            "description": "Presente si el usuario tiene `admin.users.manage`.",
+                                                            "properties": {
+                                                                "total": {
+                                                                    "type": "integer",
+                                                                    "example": 42
+                                                                },
+                                                                "active": {
+                                                                    "type": "integer",
+                                                                    "example": 38
+                                                                },
+                                                                "suspended": {
+                                                                    "type": "integer",
+                                                                    "example": 4
+                                                                }
+                                                            },
+                                                            "type": "object",
+                                                            "nullable": true
+                                                        },
+                                                        "roles": {
+                                                            "description": "Presente si el usuario tiene `admin.roles.manage`.",
+                                                            "type": "integer",
+                                                            "example": 5,
+                                                            "nullable": true
+                                                        },
+                                                        "active_sessions": {
+                                                            "description": "Presente si el usuario tiene `admin.security.view` y la feature `admin_security` está habilitada.",
+                                                            "type": "integer",
+                                                            "example": 12,
+                                                            "nullable": true
+                                                        },
+                                                        "failed_logins_24h": {
+                                                            "description": "Presente si el usuario tiene `admin.security.view` y las features `admin_security` y `login_attempts` están habilitadas.",
+                                                            "type": "integer",
+                                                            "example": 3,
+                                                            "nullable": true
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                },
+                                                "recent_activity": {
+                                                    "description": "Actividad reciente del sistema. Cada clave aparece solo si el usuario tiene el permiso y la feature correspondiente.",
+                                                    "properties": {
+                                                        "login_attempts": {
+                                                            "description": "Últimos 5 intentos de login. Presente si `admin.security.view` + features `admin_security` + `login_attempts`.",
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object"
+                                                            },
+                                                            "nullable": true
+                                                        },
+                                                        "audit_logs": {
+                                                            "description": "Últimos 5 audit logs. Presente si `admin.audit.view` + feature `audit`.",
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object"
+                                                            },
+                                                            "nullable": true
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Usuario inactivo o email no verificado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/security/login-attempts": {
+            "get": {
+                "tags": [
+                    "Admin Security"
+                ],
+                "summary": "List login attempts",
+                "description": "Returns a paginated list of login attempts for admin observability. Login identifiers are masked by default to minimize PII exposure.",
+                "operationId": "e3bc6b865db43636adf13b2455902a20",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Search by login identifier (email/username). Matched against raw value in DB.",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "maxLength": 255
+                        }
+                    },
+                    {
+                        "name": "ip",
+                        "in": "query",
+                        "description": "Filter by IP address",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "ip"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Filter by attempt status: success, failed, blocked",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "success",
+                                "failed",
+                                "blocked"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "from",
+                        "in": "query",
+                        "description": "Filter from date (inclusive)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "to",
+                        "in": "query",
+                        "description": "Filter to date (inclusive)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of items per page (1-1000, default 15)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 1000,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Paginated list of login attempts",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedLoginAttempts"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden — missing admin.security.view permission",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/permissions": {
+            "get": {
+                "tags": [
+                    "Admin - Permissions"
+                ],
+                "summary": "Listar permisos",
+                "operationId": "57a5fc56a135bf1484899503c2e8a54b",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page (hard cap 1000; real max governed by policy api.pagination.max_per_page)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 1000,
+                            "minimum": 1,
+                            "example": 15
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "users"
+                        }
+                    },
+                    {
+                        "name": "guard_name",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "api"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/policies": {
+            "get": {
+                "tags": [
+                    "Admin - Policies"
+                ],
+                "summary": "List policies (Policy Center)",
+                "operationId": "b1e6bb5634fbd92db9c7a2bafe5537ba",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "headers": {
+                            "ETag": {
+                                "description": "W/\"policy-v{n}\"",
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Admin - Policies"
+                ],
+                "summary": "Batch update policies (atomic)",
+                "operationId": "9220deeec7e26fdfc752413ff5bbfbc5",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "policies"
+                                ],
+                                "properties": {
+                                    "policies": {
+                                        "type": "object",
+                                        "example": {
+                                            "api.pagination.default_per_page": 15,
+                                            "api.pagination.max_per_page": 100
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "VALIDATION_ERROR / POLICY_CONFLICT",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "POLICY_READ_ONLY / AUTH_FORBIDDEN",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "POLICY_NOT_FOUND",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/policies/{key}": {
+            "get": {
+                "tags": [
+                    "Admin - Policies"
+                ],
+                "summary": "Get policy by key",
+                "operationId": "d1a1a6cfa9ed41f2b0adca12eb0e6d15",
+                "parameters": [
+                    {
+                        "name": "key",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "api.pagination.max_per_page"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "POLICY_NOT_FOUND",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthenticated",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/roles": {
+            "get": {
+                "tags": [
+                    "Admin - Roles"
+                ],
+                "summary": "Listar roles",
+                "operationId": "3304f243c44e96532210a28c0a419478",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page (hard cap 1000; real max governed by policy api.pagination.max_per_page)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 1000,
+                            "minimum": 1,
+                            "example": 15
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "editor"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin - Roles"
+                ],
+                "summary": "Crear rol",
+                "operationId": "91e04720add1109b183565baad2fa1f9",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "editor"
+                                    },
+                                    "guard_name": {
+                                        "type": "string",
+                                        "example": "api",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Role"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/roles/{role}": {
+            "get": {
+                "tags": [
+                    "Admin - Roles"
+                ],
+                "summary": "Ver rol",
+                "operationId": "7bf4c1406071216b79603388dd7578ad",
+                "parameters": [
+                    {
+                        "name": "role",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "01K30YQ8VQ3A5NQ2GG7T4KJ8VR"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Role"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Admin - Roles"
+                ],
+                "summary": "Actualizar rol",
+                "operationId": "f14a246e75b0aa3d57ce421312945b61",
+                "parameters": [
+                    {
+                        "name": "role",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "01K30YQ8VQ3A5NQ2GG7T4KJ8VR"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "super-editor"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Role"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin - Roles"
+                ],
+                "summary": "Eliminar rol",
+                "operationId": "18d25f1abf85f7d29a31051b899be3ac",
+                "parameters": [
+                    {
+                        "name": "role",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "01K30YQ8VQ3A5NQ2GG7T4KJ8VR"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "object",
+                                            "example": {
+                                                "message": "Rol eliminado correctamente."
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso o rol protegido (ej: admin)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Rol no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Admin - Roles"
+                ],
+                "summary": "Actualizar rol (parcial)",
+                "operationId": "79a7270d1913e91f7af8536f7f5d8c86",
+                "parameters": [
+                    {
+                        "name": "role",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "01K30YQ8VQ3A5NQ2GG7T4KJ8VR"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "super-editor"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Role"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/roles/{role}/permissions": {
+            "put": {
+                "tags": [
+                    "Admin - Roles"
+                ],
+                "summary": "Sincronizar permisos del rol",
+                "operationId": "d7dd8c6ec7897c26bdc7ade29bda3739",
+                "parameters": [
+                    {
+                        "name": "role",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "01K30YQ8VQ3A5NQ2GG7T4KJ8VR"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "permissions"
+                                ],
+                                "properties": {
+                                    "permissions": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "example": "admin.users.manage"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Role"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/service-accounts": {
+            "get": {
+                "tags": [
+                    "Admin - Service Accounts"
+                ],
+                "summary": "Listar service accounts",
+                "operationId": "410636922d1ced0a7924f1e62a98da3d",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page (hard cap 1000; real max governed by policy api.pagination.max_per_page)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 1000,
+                            "minimum": 1,
+                            "example": 15
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "ERP"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "active"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/PaginatedServiceAccounts"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin - Service Accounts"
+                ],
+                "summary": "Crear service account",
+                "operationId": "e89f8902193939be4f3d35efdec43530",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Integración - ERP Sync"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "svc-erp@service.local",
+                                        "nullable": true
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Cuenta para sincronización ERP nightly job",
+                                        "nullable": true
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "example": "user",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/ServiceAccount"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/service-accounts/{serviceAccount}": {
+            "get": {
+                "tags": [
+                    "Admin - Service Accounts"
+                ],
+                "summary": "Ver service account",
+                "operationId": "d0633a8c0c21c1d2f8e8fa71546b578e",
+                "parameters": [
+                    {
+                        "name": "serviceAccount",
+                        "in": "path",
+                        "description": "public_id (ULID) del service account",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "01J3Q8XJQZ1W2W1V9D3B2C7K8N"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/ServiceAccount"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Admin - Service Accounts"
+                ],
+                "summary": "Actualizar service account (completo)",
+                "description": "Alias de PATCH para el mismo método update. Laravel apiResource registra ambos verbos apuntando al mismo controller action.",
+                "operationId": "620e6ee841e06cf47c507f559b34be04",
+                "parameters": [
+                    {
+                        "name": "serviceAccount",
+                        "in": "path",
+                        "description": "public_id (ULID) del service account",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "01J3Q8XJQZ1W2W1V9D3B2C7K8N"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Integración - ERP Sync (Updated)",
+                                        "nullable": true
+                                    },
+                                    "status": {
+                                        "description": "active|pending|suspended",
+                                        "type": "string",
+                                        "example": "suspended",
+                                        "nullable": true
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Cuenta usada por cron job nocturno",
+                                        "nullable": true
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "example": "user",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/ServiceAccount"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Admin - Service Accounts"
+                ],
+                "summary": "Actualizar service account",
+                "operationId": "23fb0393ad80d99fb6e7a1d183a98dd5",
+                "parameters": [
+                    {
+                        "name": "serviceAccount",
+                        "in": "path",
+                        "description": "public_id (ULID) del service account",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "01J3Q8XJQZ1W2W1V9D3B2C7K8N"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Integración - ERP Sync (Updated)",
+                                        "nullable": true
+                                    },
+                                    "status": {
+                                        "description": "active|pending|suspended",
+                                        "type": "string",
+                                        "example": "suspended",
+                                        "nullable": true
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Cuenta usada por cron job nocturno",
+                                        "nullable": true
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "example": "user",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/ServiceAccount"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/users": {
+            "get": {
+                "tags": [
+                    "Admin - Users"
+                ],
+                "summary": "Listar usuarios",
+                "operationId": "273b44eaff315d8aa351728d825a3609",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page (hard cap 1000; real max governed by policy api.pagination.max_per_page)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 1000,
+                            "minimum": 1,
+                            "example": 15
+                        }
+                    },
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "admin"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "active"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/PaginatedUsers"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Admin - Users"
+                ],
+                "summary": "Crear usuario",
+                "operationId": "bd04dd5db9bb8f24193f2a710fa1b0f1",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Nuevo Usuario"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "nuevo@test.com"
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "example": "nuevo",
+                                        "nullable": true
+                                    },
+                                    "password": {
+                                        "description": "Mínimo 12 caracteres, al menos una mayúscula, una minúscula y un número.",
+                                        "type": "string",
+                                        "example": "Secret123456"
+                                    },
+                                    "status": {
+                                        "description": "active|pending|suspended",
+                                        "type": "string",
+                                        "example": "active"
+                                    },
+                                    "timezone": {
+                                        "type": "string",
+                                        "example": "America/Mexico_City",
+                                        "nullable": true
+                                    },
+                                    "locale": {
+                                        "type": "string",
+                                        "example": "es"
+                                    },
+                                    "meta": {
+                                        "type": "object",
+                                        "nullable": true
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "example": "admin",
+                                        "nullable": true
+                                    },
+                                    "role_id": {
+                                        "description": "public_id (ULID) del rol; alternativa a role por nombre",
+                                        "type": "string",
+                                        "example": "01K30YQ8VQ3A5NQ2GG7T4KJ8VR",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/admin/users/{user}": {
+            "get": {
+                "tags": [
+                    "Admin - Users"
+                ],
+                "summary": "Ver usuario",
+                "operationId": "acad4c987f4375f00541b78e50d01cf2",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "public_id (ULID)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "01KHN2Y1XYWPBEPJGB1104GDZW"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Admin - Users"
+                ],
+                "summary": "Actualizar usuario",
+                "operationId": "15b05d261f3c9a9340728d3427557edc",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "public_id (ULID)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "01KHN2Y1XYWPBEPJGB1104GDZW"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Admin Updated",
+                                        "nullable": true
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "admin2@test.com",
+                                        "nullable": true
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "example": "admin2",
+                                        "nullable": true
+                                    },
+                                    "password": {
+                                        "description": "Mínimo 12 caracteres, al menos una mayúscula, una minúscula y un número.",
+                                        "type": "string",
+                                        "example": "NewSecret123456",
+                                        "nullable": true
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "active",
+                                        "nullable": true
+                                    },
+                                    "timezone": {
+                                        "type": "string",
+                                        "example": "America/Mexico_City",
+                                        "nullable": true
+                                    },
+                                    "locale": {
+                                        "type": "string",
+                                        "example": "es",
+                                        "nullable": true
+                                    },
+                                    "meta": {
+                                        "type": "object",
+                                        "nullable": true
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "example": "admin",
+                                        "nullable": true
+                                    },
+                                    "role_id": {
+                                        "description": "public_id (ULID) del rol; alternativa a role por nombre",
+                                        "type": "string",
+                                        "example": "01K30YQ8VQ3A5NQ2GG7T4KJ8VR",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Admin - Users"
+                ],
+                "summary": "Eliminar usuario (soft delete)",
+                "operationId": "6e02b991a1ba7f580c0d92d925db7c36",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "public_id (ULID)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "01KHN2Y1XYWPBEPJGB1104GDZW"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Admin - Users"
+                ],
+                "summary": "Actualizar usuario (parcial)",
+                "description": "Alias de PUT para el mismo método update. Laravel apiResource registra ambos verbos apuntando al mismo controller action.",
+                "operationId": "300ce6a1694e6fab490708e0f93db804",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "public_id (ULID)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "01KHN2Y1XYWPBEPJGB1104GDZW"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Admin Updated",
+                                        "nullable": true
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "admin2@test.com",
+                                        "nullable": true
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "example": "admin2",
+                                        "nullable": true
+                                    },
+                                    "password": {
+                                        "description": "Mínimo 12 caracteres, al menos una mayúscula, una minúscula y un número.",
+                                        "type": "string",
+                                        "example": "NewSecret123456",
+                                        "nullable": true
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "active",
+                                        "nullable": true
+                                    },
+                                    "timezone": {
+                                        "type": "string",
+                                        "example": "America/Mexico_City",
+                                        "nullable": true
+                                    },
+                                    "locale": {
+                                        "type": "string",
+                                        "example": "es",
+                                        "nullable": true
+                                    },
+                                    "meta": {
+                                        "type": "object",
+                                        "nullable": true
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "example": "admin",
+                                        "nullable": true
+                                    },
+                                    "role_id": {
+                                        "description": "public_id (ULID) del rol; alternativa a role por nombre",
+                                        "type": "string",
+                                        "example": "01K30YQ8VQ3A5NQ2GG7T4KJ8VR",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/api-keys/exchange": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "API Key Exchange (M2M) — convierte X-API-Key en JWT + auth_session",
+                "operationId": "18c7e8eab0bd2552d4428b81e8df76da",
+                "parameters": [
+                    {
+                        "name": "X-API-Key",
+                        "in": "header",
+                        "description": "Secreto one-time generado por el Admin Panel. Nunca se almacena en claro.",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "kk_live_abc123..."
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK (misma forma que login)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthLoginResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "API key inválida / ausente / revocada / expirada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Service account inactivo o email no verificado (si aplica)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Demasiados intentos (incluye Retry-After)",
+                        "headers": {
+                            "Retry-After": {
+                                "description": "Segundos recomendados de espera antes de reintentar.",
+                                "schema": {
+                                    "type": "integer",
+                                    "example": 60
+                                }
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/email/verification-notification": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Resend Verification Email",
+                "description": "Sends a new email verification link to the authenticated user. Rate limited to 3 attempts every 10 minutes.",
+                "operationId": "resendVerificationEmail",
+                "responses": {
+                    "200": {
+                        "description": "Verification link sent successfully or already verified.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Verification link sent."
+                                                },
+                                                "verified": {
+                                                    "description": "Present when already verified",
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests — rate limited.",
+                        "headers": {
+                            "Retry-After": {
+                                "description": "Seconds until next attempt allowed.",
+                                "schema": {
+                                    "type": "integer"
+                                }
+                            }
+                        },
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/verify-email/{id}/{hash}": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Verify Email Address",
+                "description": "Verifies the user email via a signed URL. Returns a JSON envelope if Accept headers request it, or redirects to the frontend configured URL with a verified=1 or verified=0 query parameter.",
+                "operationId": "verifyEmail",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "User public ULID",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "hash",
+                        "in": "path",
+                        "description": "SHA1 hash of the user email",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "expires",
+                        "in": "query",
+                        "description": "Signature expiration timestamp",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "signature",
+                        "in": "query",
+                        "description": "URL Signature",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Email verified successfully (JSON Mode).",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "verified": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "302": {
+                        "description": "Browser Redirect to configured frontend URL."
+                    },
+                    "403": {
+                        "description": "Invalid or Expired Signature (JSON Mode). error.code = AUTH_VERIFICATION_INVALID.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/email/verification-status": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Get Verification Status",
+                "description": "Returns whether the currently authenticated user has a verified email address.",
+                "operationId": "getVerificationStatus",
+                "responses": {
+                    "200": {
+                        "description": "Status retrieved successfully.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "verified": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Login",
+                "operationId": "7b7bd0f0817efedd0e28a5c35948b270",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "login",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "login": {
+                                        "type": "string",
+                                        "example": "admin@demo.kaanforge.test"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "Secret123456"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthLoginResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Credenciales inválidas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Email no verificado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/me": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Usuario actual",
+                "operationId": "58795e5e399ea80affffc53562060f44",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthMeResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Email no verificado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Cerrar sesión",
+                "operationId": "cf67bc09cd460ce55c3ef386fb8f99a3",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Sesión cerrada correctamente."
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/refresh": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Refrescar token",
+                "operationId": "9d304303c5d60b17581caf82a1077a30",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "token_type": {
+                                                    "type": "string",
+                                                    "example": "bearer"
+                                                },
+                                                "access_token": {
+                                                    "type": "string",
+                                                    "example": "eyJ0eXAiOiJKV1QiLCJh..."
+                                                },
+                                                "expires_in": {
+                                                    "type": "integer",
+                                                    "example": 3600
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Email no verificado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/forgot-password": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Solicitar recuperación de contraseña",
+                "operationId": "68f26077fb323cde8a17d7b0dd02a48b",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "usuario@ejemplo.com"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Respuesta genérica anti-enumeración",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Si el correo existe, se enviaron instrucciones para restablecer la contraseña."
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Demasiados intentos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/reset-password": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Restablecer contraseña",
+                "operationId": "15117970fad1879c2b2a0bb2900478b2",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "token",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "usuario@ejemplo.com"
+                                    },
+                                    "token": {
+                                        "type": "string",
+                                        "example": "hash_del_token_recibido_por_email"
+                                    },
+                                    "password": {
+                                        "description": "Mínimo 12 caracteres, al menos una mayúscula, una minúscula y un número.",
+                                        "type": "string",
+                                        "format": "password",
+                                        "minLength": 12,
+                                        "example": "NuevaClave123Segura"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "NuevaClave123Segura"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Contraseña cambiada exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "message": {
+                                                    "type": "string",
+                                                    "example": "Contraseña restablecida correctamente. Inicia sesión nuevamente."
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Token inválido o expirado / Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Demasiados intentos (AUTH_TOO_MANY_ATTEMPTS). Header Retry-After incluido.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Registro público de usuario",
+                "description": "Crea una cuenta de usuario. Requiere que `KAAN_AUTH_ALLOW_PUBLIC_REGISTRATION=true` esté habilitado. Aplica rate-limit dual (IP + email).",
+                "operationId": "975824d8d5c2d896c7d5de2bee29bc9f",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AuthRegisterRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Usuario registrado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthRegisterResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Registro deshabilitado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorRegistrationDisabled"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "429": {
+                        "description": "Demasiados intentos de registro",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/auth/sessions": {
+            "get": {
+                "tags": [
+                    "Auth Sessions"
+                ],
+                "summary": "List user sessions",
+                "description": "Returns a paginated list of sessions (devices) for the authenticated user.",
+                "operationId": "79fea0457807d11975a8503e151a1182",
+                "parameters": [
+                    {
+                        "name": "include_revoked",
+                        "in": "query",
+                        "description": "Include revoked sessions in the response",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Number of sessions per page (min 1, max 1000)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 1000,
+                            "minimum": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PaginatedAuthSessions"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Email no verificado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/sessions/{session}": {
+            "delete": {
+                "tags": [
+                    "Auth Sessions"
+                ],
+                "summary": "Revoke a specific session",
+                "description": "Revokes a specific session belonging to the authenticated user.",
+                "operationId": "327ac6001baecd7c16aacd7e07c29441",
+                "parameters": [
+                    {
+                        "name": "session",
+                        "in": "path",
+                        "description": "Public ULID identifier of the session to revoke",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Session revoked successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "revoked": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "was_already_revoked": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Email no verificado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Session not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/sessions/revoke-others": {
+            "post": {
+                "tags": [
+                    "Auth Sessions"
+                ],
+                "summary": "Revoke other sessions",
+                "description": "Revokes all sessions for the authenticated user except the current one.",
+                "operationId": "cbe2c26e56dd26b42515968ddda0b148",
+                "responses": {
+                    "200": {
+                        "description": "Other sessions revoked successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "revoked_count": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Email no verificado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/auth/sessions/revoke-all": {
+            "post": {
+                "tags": [
+                    "Auth Sessions"
+                ],
+                "summary": "Revoke all sessions",
+                "description": "Revokes all sessions including the current one, terminating the current token.",
+                "operationId": "26cfb188c83cc445a12088facbc9fa95",
+                "responses": {
+                    "200": {
+                        "description": "All sessions revoked successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "revoked_count": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Email no verificado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/health": {
+            "get": {
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Health check",
+                "description": "Returns backend health status and Policy Center runtime status.",
+                "operationId": "98e91067105445db96c667473447eb2b",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "app": {
+                                                    "type": "string",
+                                                    "example": "Kaan Core Backend"
+                                                },
+                                                "version": {
+                                                    "type": "string",
+                                                    "example": "0.2.0-alpha"
+                                                },
+                                                "db": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "policy_center_enabled": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "policy_center_degraded": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "service_accounts_enabled": {
+                                                    "description": "True when KAAN_FEATURE_API_KEYS=true",
+                                                    "type": "boolean",
+                                                    "example": false
+                                                },
+                                                "time": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "ApiKey": {
+                "required": [
+                    "id",
+                    "name",
+                    "prefix",
+                    "scopes"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "ULID público de la API key",
+                        "type": "string",
+                        "example": "01J3Q90Z2YYQZ2D8JH2KX8ZQ0R"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "ERP Sync Key"
+                    },
+                    "prefix": {
+                        "type": "string",
+                        "example": "kk_live_AbC12"
+                    },
+                    "scopes": {
+                        "description": "Scopes almacenados (v1: no se enforzan)",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "read:users",
+                            "write:orders"
+                        ]
+                    },
+                    "last_used_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-03-03T18:55:00Z",
+                        "nullable": true
+                    },
+                    "expires_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-06-01T00:00:00Z",
+                        "nullable": true
+                    },
+                    "revoked_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-03-03T18:50:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "AuditLog": {
+                "title": "Audit Log",
+                "description": "A single audit log record of a platform event.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1042
+                    },
+                    "action": {
+                        "type": "string",
+                        "example": "auth.login"
+                    },
+                    "user": {
+                        "description": "El actor (usuario) que provocó la acción, si aplica.",
+                        "properties": {
+                            "id": {
+                                "description": "ULID público del usuario",
+                                "type": "string",
+                                "example": "01HJY...",
+                                "nullable": true
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "Admin User",
+                                "nullable": true
+                            },
+                            "email": {
+                                "type": "string",
+                                "example": "admin@example.com",
+                                "nullable": true
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "model": {
+                        "description": "Metadata del modelo sobre el cual se hizo la acción.",
+                        "properties": {
+                            "type": {
+                                "type": "string",
+                                "example": "App\\Models\\User",
+                                "nullable": true
+                            },
+                            "id": {
+                                "type": "integer",
+                                "example": 45,
+                                "nullable": true
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "details": {
+                        "description": "Payload con metadata adicional estructurada del evento. Se higieniza de manera recursiva por motivos de seguridad reescribiendo llaves detectadas como \"secretas\" a \"[REDACTED]\".",
+                        "type": "object",
+                        "example": "{\"ip\": \"127.0.0.1\", \"browser\": \"Chrome\"}"
+                    },
+                    "ip_address": {
+                        "type": "string",
+                        "example": "192.168.1.1",
+                        "nullable": true
+                    },
+                    "user_agent": {
+                        "type": "string",
+                        "example": "Mozilla/5.0 ...",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-02-24T12:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "AuthLoginResponse": {
+                "required": [
+                    "ok",
+                    "data"
+                ],
+                "properties": {
+                    "ok": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "data": {
+                        "required": [
+                            "token_type",
+                            "access_token",
+                            "expires_in",
+                            "user"
+                        ],
+                        "type": "object"
+                    },
+                    "token_type": {
+                        "type": "string",
+                        "example": "bearer"
+                    },
+                    "access_token": {
+                        "type": "string",
+                        "example": "eyJ0eXAiOiJKV1QiLCJh..."
+                    },
+                    "expires_in": {
+                        "type": "integer",
+                        "example": 3600
+                    },
+                    "user": {
+                        "$ref": "#/components/schemas/User"
+                    }
+                },
+                "type": "object"
+            },
+            "AuthMeResponse": {
+                "required": [
+                    "ok",
+                    "data"
+                ],
+                "properties": {
+                    "ok": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "data": {
+                        "$ref": "#/components/schemas/User"
+                    }
+                },
+                "type": "object"
+            },
+            "AuthRegisterRequest": {
+                "required": [
+                    "email",
+                    "password",
+                    "password_confirmation",
+                    "name"
+                ],
+                "properties": {
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "nuevo.usuario@ejemplo.com"
+                    },
+                    "password": {
+                        "description": "Mínimo 12 caracteres, al menos una mayúscula, una minúscula y un número.",
+                        "type": "string",
+                        "format": "password",
+                        "maxLength": 72,
+                        "minLength": 12,
+                        "example": "MiClave123Segura"
+                    },
+                    "password_confirmation": {
+                        "type": "string",
+                        "format": "password",
+                        "example": "MiClave123Segura"
+                    },
+                    "name": {
+                        "type": "string",
+                        "maxLength": 120,
+                        "example": "Juan Pérez"
+                    },
+                    "profile": {
+                        "properties": {
+                            "phone": {
+                                "type": "string",
+                                "maxLength": 30,
+                                "example": "+52 222 123 4567",
+                                "nullable": true
+                            },
+                            "company": {
+                                "type": "string",
+                                "maxLength": 120,
+                                "example": "Kaan Forge Solutions",
+                                "nullable": true
+                            }
+                        },
+                        "type": "object",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "AuthRegisterResponse": {
+                "required": [
+                    "ok",
+                    "data"
+                ],
+                "properties": {
+                    "ok": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "data": {
+                        "required": [
+                            "user",
+                            "requires_email_verification"
+                        ],
+                        "properties": {
+                            "user": {
+                                "required": [
+                                    "id",
+                                    "name",
+                                    "email",
+                                    "status"
+                                ],
+                                "properties": {
+                                    "id": {
+                                        "type": "string",
+                                        "example": "01JMAXRW1Y..."
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Juan Pérez"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "nuevo.usuario@ejemplo.com"
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "example": "active"
+                                    }
+                                },
+                                "type": "object"
+                            },
+                            "requires_email_verification": {
+                                "type": "boolean",
+                                "example": false
+                            },
+                            "token_type": {
+                                "description": "Solo presente si register_issue_token=true y status=active",
+                                "type": "string",
+                                "example": "bearer",
+                                "nullable": true
+                            },
+                            "access_token": {
+                                "type": "string",
+                                "example": "eyJ0eXAiOiJKV1QiLCJh...",
+                                "nullable": true
+                            },
+                            "expires_in": {
+                                "type": "integer",
+                                "example": 3600,
+                                "nullable": true
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "AuthSession": {
+                "title": "Auth Session",
+                "description": "User's active authentication session (device log)",
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "example": "01H0ABCDEF1234567890XYZABC"
+                    },
+                    "ip_address": {
+                        "type": "string",
+                        "example": "192.168.1.1"
+                    },
+                    "user_agent": {
+                        "type": "string",
+                        "example": "Mozilla/5.0..."
+                    },
+                    "last_seen_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "expires_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "revoked_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "is_current": {
+                        "type": "boolean",
+                        "example": true
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorRegistrationDisabled": {
+                "required": [
+                    "ok",
+                    "error"
+                ],
+                "properties": {
+                    "ok": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "error": {
+                        "required": [
+                            "code",
+                            "message",
+                            "details"
+                        ],
+                        "properties": {
+                            "code": {
+                                "type": "string",
+                                "example": "REGISTRATION_DISABLED"
+                            },
+                            "message": {
+                                "type": "string",
+                                "example": "El registro público no está habilitado."
+                            },
+                            "details": {
+                                "type": "object",
+                                "example": null,
+                                "nullable": true
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "ErrorResponse": {
+                "required": [
+                    "ok",
+                    "error"
+                ],
+                "properties": {
+                    "ok": {
+                        "type": "boolean",
+                        "example": false
+                    },
+                    "error": {
+                        "required": [
+                            "code",
+                            "message",
+                            "details"
+                        ],
+                        "type": "object"
+                    },
+                    "code": {
+                        "description": "Código de error estandarizado para manejo en Frontend.\n\nCódigos comunes:\n- `AUTH_INVALID`: Credenciales incorrectas.\n- `AUTH_USER_INACTIVE`: Usuario suspendido o inactivo.\n- `AUTH_TOO_MANY_ATTEMPTS`: Límite de intentos (rate limiting login).\n- `AUTH_TOO_MANY_REQUESTS`: Límite de intentos (rate limiting registro).\n- `AUTH_ACCOUNT_LOCKED`: Cuenta bloqueada temporalmente por fallos excesivos.\n- `AUTH_TOKEN_EXPIRED`: El token JWT ha expirado.\n- `AUTH_TOKEN_REVOKED`: El token fue revocado o está en blacklist.\n- `AUTH_TOKEN_INVALID`: Token malformado o firma incorrecta.\n- `AUTH_SESSION_NOT_FOUND`: Sesión no existe en base de datos (deslogueo forzado).\n- `AUTH_SESSION_EXPIRED`: Sesión expirada por tiempo de inactividad.\n- `AUTH_FORBIDDEN`: No tiene permisos para esta acción.\n- `REGISTRATION_DISABLED`: El registro público no está habilitado.\n- `VALIDATION_ERROR`: Error de validación de campos (ver `details`).",
+                        "type": "string",
+                        "example": "AUTH_FORBIDDEN"
+                    },
+                    "message": {
+                        "type": "string",
+                        "example": "No tienes permiso para realizar esta acción."
+                    },
+                    "details": {
+                        "type": "object",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "LoginAttemptSchema": {
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 42
+                    },
+                    "login_masked": {
+                        "type": "string",
+                        "example": "j***n@example.com"
+                    },
+                    "login_raw": {
+                        "description": "Only visible when expose_raw_identifier_to_admin is enabled",
+                        "type": "string",
+                        "example": null,
+                        "nullable": true
+                    },
+                    "status": {
+                        "type": "string",
+                        "enum": [
+                            "success",
+                            "failed",
+                            "blocked"
+                        ]
+                    },
+                    "ip_address": {
+                        "type": "string",
+                        "example": "192.168.1.100"
+                    },
+                    "user_agent": {
+                        "type": "string",
+                        "example": "Mozilla/5.0 ...",
+                        "nullable": true
+                    },
+                    "blocked_until": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "PaginatedApiKeys": {
+                "required": [
+                    "data",
+                    "links",
+                    "meta"
+                ],
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ApiKey"
+                        }
+                    },
+                    "links": {
+                        "type": "object"
+                    },
+                    "meta": {
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "PaginatedAuditLogs": {
+                "title": "Paginated Audit Logs",
+                "description": "Response format for paginated audit logs",
+                "allOf": [
+                    {
+                        "properties": {
+                            "ok": {
+                                "type": "boolean",
+                                "example": true
+                            },
+                            "data": {
+                                "properties": {
+                                    "data": {
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/components/schemas/AuditLog"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "PaginatedAuthSessions": {
+                "title": "Paginated Auth Sessions",
+                "description": "Response format for paginated auth sessions",
+                "allOf": [
+                    {
+                        "properties": {
+                            "ok": {
+                                "type": "boolean",
+                                "example": true
+                            },
+                            "data": {
+                                "properties": {
+                                    "data": {
+                                        "type": "array",
+                                        "items": {
+                                            "$ref": "#/components/schemas/AuthSession"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "type": "object"
+                    }
+                ]
+            },
+            "PaginatedLoginAttempts": {
+                "properties": {
+                    "ok": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "data": {
+                        "properties": {
+                            "data": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/components/schemas/LoginAttemptSchema"
+                                }
+                            },
+                            "current_page": {
+                                "type": "integer",
+                                "example": 1
+                            },
+                            "last_page": {
+                                "type": "integer",
+                                "example": 5
+                            },
+                            "per_page": {
+                                "type": "integer",
+                                "example": 15
+                            },
+                            "total": {
+                                "type": "integer",
+                                "example": 73
+                            }
+                        },
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "PaginatedServiceAccounts": {
+                "required": [
+                    "data",
+                    "links",
+                    "meta"
+                ],
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ServiceAccount"
+                        }
+                    },
+                    "links": {
+                        "type": "object"
+                    },
+                    "meta": {
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "PaginatedUsers": {
+                "required": [
+                    "data",
+                    "links",
+                    "meta"
+                ],
+                "properties": {
+                    "data": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/User"
+                        }
+                    },
+                    "links": {
+                        "type": "object"
+                    },
+                    "meta": {
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "Policy": {
+                "required": [
+                    "key",
+                    "meta"
+                ],
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "example": "api.pagination.max_per_page"
+                    },
+                    "value": {
+                        "nullable": true,
+                        "oneOf": [
+                            {
+                                "type": "boolean"
+                            },
+                            {
+                                "type": "integer"
+                            },
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            {
+                                "type": "object"
+                            }
+                        ]
+                    },
+                    "meta": {
+                        "type": "object"
+                    }
+                },
+                "type": "object"
+            },
+            "Role": {
+                "required": [
+                    "id",
+                    "name",
+                    "guard_name"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "ULID publico del rol",
+                        "type": "string",
+                        "example": "01K30YQ8VQ3A5NQ2GG7T4KJ8VR"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "admin"
+                    },
+                    "guard_name": {
+                        "type": "string",
+                        "example": "api"
+                    },
+                    "permissions": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "admin.users.manage",
+                            "admin.roles.manage"
+                        ]
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    }
+                },
+                "type": "object"
+            },
+            "ServiceAccount": {
+                "required": [
+                    "id",
+                    "type",
+                    "name",
+                    "email",
+                    "status"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "ULID público del service account",
+                        "type": "string",
+                        "example": "01J3Q8XJQZ1W2W1V9D3B2C7K8N"
+                    },
+                    "type": {
+                        "description": "Clasificación del usuario",
+                        "type": "string",
+                        "example": "service"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Integración - ERP Sync"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "svc-01J3Q8XJQZ1W2W1V9D3B2C7K8N@service.local"
+                    },
+                    "status": {
+                        "description": "active|pending|suspended",
+                        "type": "string",
+                        "example": "active"
+                    },
+                    "meta": {
+                        "description": "Metadata libre (ej: description)",
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "roles": {
+                        "description": "Roles asignados al service account",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "user"
+                        ]
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-03-03T18:30:00Z"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2026-03-03T18:45:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "User": {
+                "required": [
+                    "id",
+                    "name",
+                    "email",
+                    "status"
+                ],
+                "properties": {
+                    "id": {
+                        "description": "ULID público del usuario",
+                        "type": "string",
+                        "example": "01KHN2Y1XYWPBEPJGB1104GDZW"
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Admin"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "admin@demo.kaanforge.test"
+                    },
+                    "username": {
+                        "type": "string",
+                        "example": "admin",
+                        "nullable": true
+                    },
+                    "status": {
+                        "description": "active|pending|suspended",
+                        "type": "string",
+                        "example": "active"
+                    },
+                    "timezone": {
+                        "type": "string",
+                        "example": "America/Mexico_City",
+                        "nullable": true
+                    },
+                    "locale": {
+                        "type": "string",
+                        "example": "es"
+                    },
+                    "meta": {
+                        "type": "object",
+                        "nullable": true
+                    },
+                    "roles": {
+                        "description": "Roles asignados al usuario",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "admin",
+                            "editor"
+                        ]
+                    },
+                    "permissions": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "example": [
+                            "users.create",
+                            "users.read",
+                            "users.update",
+                            "users.delete"
+                        ]
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Admin - API Keys",
+            "description": "Admin - API Keys"
+        },
+        {
+            "name": "Admin Audit Logs",
+            "description": "Admin Audit Logs"
+        },
+        {
+            "name": "Admin - Dashboard",
+            "description": "Admin - Dashboard"
+        },
+        {
+            "name": "Admin Security",
+            "description": "Admin Security"
+        },
+        {
+            "name": "Admin - Permissions",
+            "description": "Admin - Permissions"
+        },
+        {
+            "name": "Admin - Policies",
+            "description": "Admin - Policies"
+        },
+        {
+            "name": "Admin - Roles",
+            "description": "Admin - Roles"
+        },
+        {
+            "name": "Admin - Service Accounts",
+            "description": "Admin - Service Accounts"
+        },
+        {
+            "name": "Admin - Users",
+            "description": "Admin - Users"
+        },
+        {
+            "name": "Auth",
+            "description": "Auth"
+        },
+        {
+            "name": "Authentication",
+            "description": "Authentication"
+        },
+        {
+            "name": "Auth Sessions",
+            "description": "Auth Sessions"
+        },
+        {
+            "name": "Health",
+            "description": "Health"
+        }
+    ]
+}

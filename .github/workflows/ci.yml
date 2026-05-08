@@ -1,0 +1,52 @@
+name: CI — Tests + Contract Gate
+
+on:
+  pull_request:
+  push:
+    branches:
+      - dev
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-contract:
+    name: Tests + Swagger Contract
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          tools: composer:v2
+          coverage: none
+          extensions: mbstring, pdo, pdo_sqlite, sqlite3, openssl, dom, xml, xmlwriter
+
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Prepare environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          php artisan jwt:secret --force
+
+      - name: Run test suite
+        run: php artisan test
+
+      - name: Generate Swagger (OpenAPI)
+        run: php artisan l5-swagger:generate
+
+      - name: Check OpenAPI contract drift
+        run: git diff --exit-code -- storage/api-docs/api-docs.json

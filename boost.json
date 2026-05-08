@@ -1,0 +1,16 @@
+{
+    "agents": [
+        "codex",
+        "copilot",
+        "gemini"
+    ],
+    "skills": [
+        "eloquent-best-practices",
+        "laravel-11-12-app-guidelines",
+        "laravel-best-practices",
+        "laravel-specialist",
+        "laravel-tdd",
+        "php-best-practices",
+        "php-pro"
+    ]
+}
