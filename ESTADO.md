@@ -2,7 +2,7 @@
 
 > Archivo de contexto para agentes y desarrolladores.
 > Actualizar al cerrar cada plan o tarea significativa.
-> **Última actualización:** 2026-05-08
+> **Última actualización:** 2026-05-11
 
 ---
 
@@ -173,9 +173,17 @@ Estado por módulo:
 
 ---
 
-### 🔲 Plan 3 — Módulos Fase 3: Flujo core del invitado (PENDIENTE)
+### 🟡 Plan 3 — Módulos Fase 3: Flujo core del invitado (EN PROGRESO)
 
 Módulos: `rsvp`, `attendance`
+
+Estado por módulo:
+- `rsvp` ✅ implementado — 16/16 tests verdes (2026-05-11)
+  - RSVP mapea a tabla `guests` (igual que legacy)
+  - Endpoint público: `POST /api/v1/events/{slug}/rsvp` (sin auth)
+  - Guest CRUD: `GET/POST/PUT/DELETE /api/v1/events/{slug}/guests` (owner del evento)
+  - Seat cap enforced en Service
+- `attendance` 🔲 pendiente
 
 **Fuente de lógica legacy:**
 - `C:\xampp\htdocs\camaleon\app\Http\Controllers\Public\RsvpController.php`
