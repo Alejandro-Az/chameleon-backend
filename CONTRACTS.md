@@ -443,6 +443,229 @@ Success 200:
 }
 ```
 
+### POST /v1/events/{slug}/rsvp
+
+Publico. El invitado confirma o actualiza su asistencia usando su codigo de invitacion.
+
+**Auth:** ninguna (publico)  
+**Parametros de ruta:** `slug` — slug del evento.
+
+Request:
+
+```json
+{
+    "invitation_code": "ANA2024",
+    "rsvp_status": "yes",
+    "guests_confirmed": 2,
+    "rsvp_message": "Ahi estaremos!",
+    "show_in_public_list": true,
+    "dietary_tags": ["vegano"],
+    "dietary_notes": "Alergia a los cacahuates"
+}
+```
+
+Reglas relevantes:
+
+- `invitation_code`: requerido, string, max 100.
+- `rsvp_status`: requerido, enum `yes | no | maybe`.
+- `guests_confirmed`: requerido cuando `rsvp_status` es `yes` o `maybe`, integer, min 1, max 20.
+- `rsvp_message`: opcional, string, max 1000.
+- `show_in_public_list`: opcional, boolean.
+- `dietary_tags`: opcional, array de strings. Valores permitidos: `vegano`, `vegetariano`, `sin_gluten`, `diabetico`, `sin_lactosa`, `alergia_nueces`.
+- `dietary_notes`: opcional, string, max 1000.
+
+Success 200:
+
+```json
+{
+    "ok": true,
+    "data": {
+        "id": "01KHN2Y1XYWPBEPJGB1104GDZW",
+        "name": "Ana Garcia",
+        "email": "ana@ejemplo.com",
+        "phone": "+52 55 1234 5678",
+        "invitation_code": "ANA2024",
+        "invited_seats": 2,
+        "rsvp_status": "yes",
+        "guests_confirmed": 2,
+        "rsvp_message": "Ahi estaremos!",
+        "show_in_public_list": true,
+        "dietary_tags": ["vegano"],
+        "dietary_notes": "Alergia a los cacahuates",
+        "seat_label": "Mesa 3",
+        "checked_in_at": null,
+        "created_at": "2026-05-11T00:00:00+00:00",
+        "updated_at": "2026-05-11T00:00:00+00:00"
+    }
+}
+```
+
+Errores relevantes:
+
+- 404 `RSVP_INVITATION_NOT_FOUND`: no existe invitacion con ese codigo para el evento.
+- 422 `RSVP_SEATS_EXCEEDED`: `guests_confirmed` supera el limite de la invitacion. Incluye `details.max_seats`.
+- 422: validacion fallida `{ "errors": { "campo": ["mensaje"] } }`.
+
+### GET /v1/events/{slug}/guests
+
+Privado (owner del evento). Lista invitados del evento.
+
+**Auth:** Bearer JWT (owner del evento)  
+**Parametros de ruta:** `slug` — slug del evento.
+
+Success 200:
+
+```json
+{
+    "ok": true,
+    "data": [
+        {
+            "id": "01KHN2Y1XYWPBEPJGB1104GDZW",
+            "name": "Ana Garcia",
+            "email": "ana@ejemplo.com",
+            "phone": "+52 55 1234 5678",
+            "invitation_code": "ANA2024",
+            "invited_seats": 2,
+            "rsvp_status": "yes",
+            "guests_confirmed": 2,
+            "rsvp_message": "Ahi estaremos!",
+            "show_in_public_list": true,
+            "dietary_tags": ["vegano"],
+            "dietary_notes": "Alergia a los cacahuates",
+            "seat_label": "Mesa 3",
+            "checked_in_at": null,
+            "created_at": "2026-05-11T00:00:00+00:00",
+            "updated_at": "2026-05-11T00:00:00+00:00"
+        }
+    ]
+}
+```
+
+Errores relevantes:
+
+- 401: no autenticado.
+- 403 `AUTH_FORBIDDEN`: no es owner del evento.
+- 404: evento no encontrado.
+
+### POST /v1/events/{slug}/guests
+
+Privado (owner del evento). Crea un invitado con su codigo de invitacion.
+
+**Auth:** Bearer JWT (owner del evento)  
+**Parametros de ruta:** `slug` — slug del evento.
+
+Request:
+
+```json
+{
+    "name": "Ana Garcia",
+    "email": "ana@ejemplo.com",
+    "phone": "+52 55 1234 5678",
+    "invitation_code": "ANA2024",
+    "invited_seats": 2,
+    "seat_label": "Mesa 3"
+}
+```
+
+Reglas relevantes:
+
+- `name`: requerido, string, max 200.
+- `email`: opcional, email valido, max 200.
+- `phone`: opcional, string, max 50.
+- `invitation_code`: requerido, string, max 100, unico en la tabla `guests`.
+- `invited_seats`: opcional, integer, min 1, max 50.
+- `seat_label`: opcional, string, max 100.
+
+Success 201:
+
+```json
+{
+    "ok": true,
+    "data": {
+        "id": "01KHN2Y1XYWPBEPJGB1104GDZW",
+        "name": "Ana Garcia",
+        "email": "ana@ejemplo.com",
+        "phone": "+52 55 1234 5678",
+        "invitation_code": "ANA2024",
+        "invited_seats": 2,
+		"rsvp_status": "pending",
+        "guests_confirmed": null,
+        "rsvp_message": null,
+        "show_in_public_list": false,
+        "dietary_tags": [],
+        "dietary_notes": null,
+        "seat_label": "Mesa 3",
+        "checked_in_at": null,
+        "created_at": "2026-05-11T00:00:00+00:00",
+        "updated_at": "2026-05-11T00:00:00+00:00"
+    }
+}
+```
+
+Errores relevantes:
+
+- 401: no autenticado.
+- 403 `AUTH_FORBIDDEN`: no es owner del evento.
+- 422: validacion fallida (incluye unicidad de `invitation_code`).
+
+### PUT /v1/events/{slug}/guests/{id}
+
+Privado (owner del evento). Actualiza datos del invitado. No modifica el estado RSVP.
+
+**Auth:** Bearer JWT (owner del evento)  
+**Parametros de ruta:** `slug` — slug del evento. `id` — `public_id` del invitado.
+
+Request (todos opcionales):
+
+```json
+{
+    "name": "Ana Garcia Actualizada",
+    "email": "ana2@ejemplo.com",
+    "phone": "+52 55 9999 9999",
+    "invited_seats": 3,
+    "seat_label": "Mesa 5"
+}
+```
+
+Reglas relevantes:
+
+- `name`: opcional, string, max 200.
+- `email`: opcional, email valido, max 200.
+- `phone`: opcional, string, max 50.
+- `invited_seats`: opcional, integer, min 1, max 50.
+- `seat_label`: opcional, string, max 100.
+
+Success 200: retorna el invitado actualizado en `data` con la misma forma que `POST /guests`.
+
+Errores relevantes:
+
+- 401: no autenticado.
+- 403 `AUTH_FORBIDDEN`: no es owner del evento.
+- 404: invitado no encontrado en el evento.
+- 422: validacion fallida.
+
+### DELETE /v1/events/{slug}/guests/{id}
+
+Privado (owner del evento). Elimina (soft-delete) un invitado.
+
+**Auth:** Bearer JWT (owner del evento)  
+**Parametros de ruta:** `slug` — slug del evento. `id` — `public_id` del invitado.
+
+Success 200:
+
+```json
+{
+    "ok": true,
+    "data": null
+}
+```
+
+Errores relevantes:
+
+- 401: no autenticado.
+- 403 `AUTH_FORBIDDEN`: no es owner del evento.
+- 404: invitado no encontrado en el evento.
+
 ---
 
 ## Templates

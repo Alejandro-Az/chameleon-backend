@@ -55,4 +55,9 @@ class Event extends Model
     {
         return $this->hasMany(EventDressCode::class)->orderBy('display_order');
     }
+
+    public function guests(): HasMany
+    {
+        return $this->hasMany(Guest::class);
+    }
 }

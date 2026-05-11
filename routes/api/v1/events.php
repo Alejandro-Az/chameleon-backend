@@ -4,10 +4,12 @@ use App\Http\Controllers\Api\V1\EventController;
 use App\Http\Controllers\Api\V1\EventDressCodeController;
 use App\Http\Controllers\Api\V1\EventLocationController;
 use App\Http\Controllers\Api\V1\EventScheduleController;
+use App\Http\Controllers\Api\V1\RsvpController;
 use Illuminate\Support\Facades\Route;
 
 // Rutas públicas (sin auth)
 Route::get('events/{slug}', [EventController::class, 'show']);
+Route::post('events/{slug}/rsvp', [RsvpController::class, 'submit']);
 
 // Rutas del master (requieren auth)
 Route::middleware(['auth:api', 'user.active', 'user.verified', 'jwt.not_revoked'])->group(function () {
@@ -32,4 +34,9 @@ Route::middleware(['auth:api', 'user.active', 'user.verified', 'jwt.not_revoked'
     Route::post('events/{slug}/dress-codes', [EventDressCodeController::class, 'store']);
     Route::put('events/{slug}/dress-codes/{id}', [EventDressCodeController::class, 'update']);
     Route::delete('events/{slug}/dress-codes/{id}', [EventDressCodeController::class, 'destroy']);
+
+    Route::get('events/{slug}/guests', [RsvpController::class, 'index']);
+    Route::post('events/{slug}/guests', [RsvpController::class, 'store']);
+    Route::put('events/{slug}/guests/{id}', [RsvpController::class, 'update']);
+    Route::delete('events/{slug}/guests/{id}', [RsvpController::class, 'destroy']);
 });
