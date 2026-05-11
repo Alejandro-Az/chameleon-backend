@@ -193,6 +193,29 @@ class RsvpsTest extends TestCase
         $response->assertStatus(422);
     }
 
+    public function test_invitation_code_can_repeat_in_different_events(): void
+    {
+        $master = $this->makeMaster();
+        $token = $this->loginToken($master);
+        $eventA = Event::factory()->create(['owner_id' => $master->id]);
+        $eventB = Event::factory()->create(['owner_id' => $master->id]);
+
+        Guest::factory()->create([
+            'event_id' => $eventA->id,
+            'invitation_code' => 'REPEAT01',
+        ]);
+
+        $response = $this->withHeaders($this->authHeader($token))
+            ->postJson("/api/v1/events/{$eventB->slug}/guests", [
+                'name' => 'Invitado Evento B',
+                'invitation_code' => 'REPEAT01',
+            ]);
+
+        $response->assertStatus(201)
+            ->assertJsonPath('ok', true)
+            ->assertJsonPath('data.invitation_code', 'REPEAT01');
+    }
+
     // -------------------------------------------------------------------------
     // Public RSVP submit endpoint
     // -------------------------------------------------------------------------

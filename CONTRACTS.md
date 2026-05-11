@@ -572,7 +572,7 @@ Reglas relevantes:
 - `name`: requerido, string, max 200.
 - `email`: opcional, email valido, max 200.
 - `phone`: opcional, string, max 50.
-- `invitation_code`: requerido, string, max 100, unico en la tabla `guests`.
+- `invitation_code`: requerido, string, max 100, unico por evento (`event_id + invitation_code`).
 - `invited_seats`: opcional, integer, min 1, max 50.
 - `seat_label`: opcional, string, max 100.
 
@@ -665,6 +665,128 @@ Errores relevantes:
 - 401: no autenticado.
 - 403 `AUTH_FORBIDDEN`: no es owner del evento.
 - 404: invitado no encontrado en el evento.
+
+### GET /v1/events/{slug}/attendance
+
+Privado (owner del evento). Lista invitados que ya realizaron check-in.
+
+**Auth:** Bearer JWT (owner del evento)  
+**Parametros de ruta:** `slug` — slug del evento.
+
+Success 200:
+
+```json
+{
+    "ok": true,
+    "data": [
+        {
+            "id": "01KHN2Y1XYWPBEPJGB1104GDZW",
+            "name": "Ana Garcia",
+            "email": "ana@ejemplo.com",
+            "phone": "+52 55 1234 5678",
+            "invitation_code": "ANA2024",
+            "invited_seats": 2,
+            "rsvp_status": "yes",
+            "guests_confirmed": 2,
+            "rsvp_message": "Ahi estaremos!",
+            "show_in_public_list": true,
+            "dietary_tags": ["vegano"],
+            "dietary_notes": "Alergia a los cacahuates",
+            "seat_label": "Mesa 3",
+            "checked_in_at": "2026-12-15T17:05:00+00:00",
+            "created_at": "2026-05-11T00:00:00+00:00",
+            "updated_at": "2026-05-11T00:00:00+00:00"
+        }
+    ]
+}
+```
+
+Errores relevantes:
+
+- 401: no autenticado.
+- 403 `AUTH_FORBIDDEN`: no es owner del evento.
+- 404: evento no encontrado.
+
+### POST /v1/events/{slug}/attendance/{guest}
+
+Privado (owner del evento). Registra check-in de un invitado (estampa `checked_in_at` con la hora actual).
+
+**Auth:** Bearer JWT (owner del evento)  
+**Parametros de ruta:** `slug` — slug del evento. `guest` — `public_id` del invitado.  
+**Body:** ninguno.
+
+Success 200:
+
+```json
+{
+    "ok": true,
+    "data": {
+        "id": "01KHN2Y1XYWPBEPJGB1104GDZW",
+        "name": "Ana Garcia",
+        "email": "ana@ejemplo.com",
+        "phone": "+52 55 1234 5678",
+        "invitation_code": "ANA2024",
+        "invited_seats": 2,
+        "rsvp_status": "yes",
+        "guests_confirmed": 2,
+        "rsvp_message": "Ahi estaremos!",
+        "show_in_public_list": true,
+        "dietary_tags": ["vegano"],
+        "dietary_notes": "Alergia a los cacahuates",
+        "seat_label": "Mesa 3",
+        "checked_in_at": "2026-12-15T17:05:00+00:00",
+        "created_at": "2026-05-11T00:00:00+00:00",
+        "updated_at": "2026-05-11T00:00:00+00:00"
+    }
+}
+```
+
+Errores relevantes:
+
+- 401: no autenticado.
+- 403 `AUTH_FORBIDDEN`: no es owner del evento.
+- 404: invitado no encontrado en el evento.
+- 422 `ATTENDANCE_ALREADY_CHECKED_IN`: el invitado ya tiene check-in registrado.
+
+### DELETE /v1/events/{slug}/attendance/{guest}
+
+Privado (owner del evento). Revierte check-in de un invitado (limpia `checked_in_at`).
+
+**Auth:** Bearer JWT (owner del evento)  
+**Parametros de ruta:** `slug` — slug del evento. `guest` — `public_id` del invitado.
+
+Success 200:
+
+```json
+{
+    "ok": true,
+    "data": {
+        "id": "01KHN2Y1XYWPBEPJGB1104GDZW",
+        "name": "Ana Garcia",
+        "email": "ana@ejemplo.com",
+        "phone": "+52 55 1234 5678",
+        "invitation_code": "ANA2024",
+        "invited_seats": 2,
+        "rsvp_status": "yes",
+        "guests_confirmed": 2,
+        "rsvp_message": "Ahi estaremos!",
+        "show_in_public_list": true,
+        "dietary_tags": ["vegano"],
+        "dietary_notes": "Alergia a los cacahuates",
+        "seat_label": "Mesa 3",
+        "checked_in_at": null,
+        "created_at": "2026-05-11T00:00:00+00:00",
+        "updated_at": "2026-05-11T00:00:00+00:00"
+    }
+}
+```
+
+Errores relevantes:
+
+- 401: no autenticado.
+- 403 `AUTH_FORBIDDEN`: no es owner del evento.
+- 404: invitado no encontrado en el evento.
+- 422 `ATTENDANCE_NOT_CHECKED_IN`: el invitado no tiene check-in registrado.
 
 ---
 

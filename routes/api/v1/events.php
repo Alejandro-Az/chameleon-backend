@@ -1,5 +1,6 @@
 <?php
 // routes/api/v1/events.php
+use App\Http\Controllers\Api\V1\AttendanceController;
 use App\Http\Controllers\Api\V1\EventController;
 use App\Http\Controllers\Api\V1\EventDressCodeController;
 use App\Http\Controllers\Api\V1\EventLocationController;
@@ -39,4 +40,8 @@ Route::middleware(['auth:api', 'user.active', 'user.verified', 'jwt.not_revoked'
     Route::post('events/{slug}/guests', [RsvpController::class, 'store']);
     Route::put('events/{slug}/guests/{id}', [RsvpController::class, 'update']);
     Route::delete('events/{slug}/guests/{id}', [RsvpController::class, 'destroy']);
+
+    Route::get('events/{slug}/attendance', [AttendanceController::class, 'index']);
+    Route::post('events/{slug}/attendance/{guest}', [AttendanceController::class, 'store']);
+    Route::delete('events/{slug}/attendance/{guest}', [AttendanceController::class, 'destroy']);
 });

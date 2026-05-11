@@ -183,7 +183,11 @@ Estado por módulo:
   - Endpoint público: `POST /api/v1/events/{slug}/rsvp` (sin auth)
   - Guest CRUD: `GET/POST/PUT/DELETE /api/v1/events/{slug}/guests` (owner del evento)
   - Seat cap enforced en Service
-- `attendance` 🔲 pendiente
+- `attendance` ✅ implementado — 11/11 tests verdes (2026-05-11)
+  - Sin migration nueva — reutiliza `checked_in_at` de `guests`
+  - Check-in: `POST /api/v1/events/{slug}/attendance/{guest}`
+  - Revertir: `DELETE /api/v1/events/{slug}/attendance/{guest}`
+  - Listar: `GET /api/v1/events/{slug}/attendance`
 
 **Fuente de lógica legacy:**
 - `C:\xampp\htdocs\camaleon\app\Http\Controllers\Public\RsvpController.php`
