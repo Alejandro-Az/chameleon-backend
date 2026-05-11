@@ -1239,4 +1239,297 @@ Errores relevantes:
 
 - 401: no autenticado.
 - 403 `AUTH_FORBIDDEN`: no es owner del evento.
+
+---
+
+## Historia del evento (Story)
+
+Entradas de historia asociadas a un evento. Todos los endpoints requieren ser owner del evento.
+
+### GET /v1/events/{slug}/story
+
+Lista todas las entradas de historia del evento ordenadas por `display_order`.
+
+**Auth:** Bearer JWT (owner del evento)  
+**Parametros de ruta:** `slug` — slug del evento.
+
+Success 200:
+
+```json
+{
+    "ok": true,
+    "data": [
+        {
+            "id": "01KHN2Y1XYWPBEPJGB1104GDZW",
+            "title": "Como nos conocimos",
+            "subtitle": "Una historia de amor",
+            "body": "Era una noche de verano...",
+            "display_order": 0,
+            "is_enabled": true,
+            "created_at": "2026-05-11T00:00:00+00:00",
+            "updated_at": "2026-05-11T00:00:00+00:00"
+        }
+    ]
+}
+```
+
+Errores relevantes:
+
+- 401: no autenticado.
+- 403 `AUTH_FORBIDDEN`: no es owner del evento.
+- 404: evento no encontrado.
+
+### POST /v1/events/{slug}/story
+
+Crea una nueva entrada de historia para el evento.
+
+**Auth:** Bearer JWT (owner del evento)  
+**Parametros de ruta:** `slug` — slug del evento.
+
+Body:
+
+```json
+{
+    "title": "string — opcional, max 150",
+    "subtitle": "string — opcional, max 255",
+    "body": "string — requerido, max 5000",
+    "display_order": "integer — opcional, min 0",
+    "is_enabled": "boolean — opcional"
+}
+```
+
+Success 201:
+
+```json
+{
+    "ok": true,
+    "data": {
+        "id": "01KHN2Y1XYWPBEPJGB1104GDZW",
+        "title": "Como nos conocimos",
+        "subtitle": "Una historia de amor",
+        "body": "Era una noche de verano...",
+        "display_order": 0,
+        "is_enabled": true,
+        "created_at": "2026-05-11T00:00:00+00:00",
+        "updated_at": "2026-05-11T00:00:00+00:00"
+    }
+}
+```
+
+Errores relevantes:
+
+- 401: no autenticado.
+- 403 `AUTH_FORBIDDEN`: no es owner del evento.
+- 404: evento no encontrado.
+- 422: validacion fallida `{ "errors": { "campo": ["mensaje"] } }`.
+
+### PUT /v1/events/{slug}/story/{story}
+
+Actualiza una entrada de historia existente. `story` corresponde al `public_id` de la entrada.
+
+**Auth:** Bearer JWT (owner del evento)  
+**Parametros de ruta:** `slug` — slug del evento. `story` — `public_id` de la entrada.
+
+Body (todos los campos son opcionales):
+
+```json
+{
+    "title": "string — opcional, max 150",
+    "subtitle": "string — opcional, max 255",
+    "body": "string — opcional, max 5000",
+    "display_order": "integer — opcional, min 0",
+    "is_enabled": "boolean — opcional"
+}
+```
+
+Success 200:
+
+```json
+{
+    "ok": true,
+    "data": {
+        "id": "01KHN2Y1XYWPBEPJGB1104GDZW",
+        "title": "Titulo actualizado",
+        "subtitle": "Subtitulo actualizado",
+        "body": "Cuerpo actualizado",
+        "display_order": 1,
+        "is_enabled": true,
+        "created_at": "2026-05-11T00:00:00+00:00",
+        "updated_at": "2026-05-11T00:00:00+00:00"
+    }
+}
+```
+
+Errores relevantes:
+
+- 401: no autenticado.
+- 403 `AUTH_FORBIDDEN`: no es owner del evento.
+- 404: evento o entrada no encontrada.
+- 422: validacion fallida `{ "errors": { "campo": ["mensaje"] } }`.
+
+### DELETE /v1/events/{slug}/story/{story}
+
+Elimina una entrada de historia. `story` corresponde al `public_id` de la entrada.
+
+**Auth:** Bearer JWT (owner del evento)  
+**Parametros de ruta:** `slug` — slug del evento. `story` — `public_id` de la entrada.
+
+Success 200:
+
+```json
+{
+    "ok": true,
+    "data": null
+}
+```
+
+Errores relevantes:
+
+- 401: no autenticado.
+- 403 `AUTH_FORBIDDEN`: no es owner del evento.
+- 404: evento o entrada no encontrada.
+
+---
+
+## Frases romanticas (Romantic Phrases)
+
+Frases romanticas asociadas a un evento. Todos los endpoints requieren ser owner del evento.
+
+### GET /v1/events/{slug}/romantic-phrases
+
+Lista todas las frases romanticas del evento ordenadas por `display_order`.
+
+**Auth:** Bearer JWT (owner del evento)  
+**Parametros de ruta:** `slug` — slug del evento.
+
+Success 200:
+
+```json
+{
+    "ok": true,
+    "data": [
+        {
+            "id": "01KHN2Y1XYWPBEPJGB1104GDZW",
+            "phrase": "Eres mi hoy y todo mi manana.",
+            "author": "Pablo Neruda",
+            "display_order": 0,
+            "is_enabled": true,
+            "created_at": "2026-05-11T00:00:00+00:00",
+            "updated_at": "2026-05-11T00:00:00+00:00"
+        }
+    ]
+}
+```
+
+Errores relevantes:
+
+- 401: no autenticado.
+- 403 `AUTH_FORBIDDEN`: no es owner del evento.
+- 404: evento no encontrado.
+
+### POST /v1/events/{slug}/romantic-phrases
+
+Crea una nueva frase romantica para el evento.
+
+**Auth:** Bearer JWT (owner del evento)  
+**Parametros de ruta:** `slug` — slug del evento.
+
+Body:
+
+```json
+{
+    "phrase": "string — requerido, max 500",
+    "author": "string — opcional, max 150",
+    "display_order": "integer — opcional, min 0",
+    "is_enabled": "boolean — opcional"
+}
+```
+
+Success 201:
+
+```json
+{
+    "ok": true,
+    "data": {
+        "id": "01KHN2Y1XYWPBEPJGB1104GDZW",
+        "phrase": "Eres mi hoy y todo mi manana.",
+        "author": "Pablo Neruda",
+        "display_order": 0,
+        "is_enabled": true,
+        "created_at": "2026-05-11T00:00:00+00:00",
+        "updated_at": "2026-05-11T00:00:00+00:00"
+    }
+}
+```
+
+Errores relevantes:
+
+- 401: no autenticado.
+- 403 `AUTH_FORBIDDEN`: no es owner del evento.
+- 404: evento no encontrado.
+- 422: validacion fallida `{ "errors": { "campo": ["mensaje"] } }`.
+
+### PUT /v1/events/{slug}/romantic-phrases/{phrase}
+
+Actualiza una frase romantica existente. `phrase` corresponde al `public_id` de la frase.
+
+**Auth:** Bearer JWT (owner del evento)  
+**Parametros de ruta:** `slug` — slug del evento. `phrase` — `public_id` de la frase.
+
+Body (todos los campos son opcionales; si `phrase` se envia, es requerido y no puede estar vacio):
+
+```json
+{
+    "phrase": "string — opcional/requerido si presente, max 500",
+    "author": "string — opcional, max 150",
+    "display_order": "integer — opcional, min 0",
+    "is_enabled": "boolean — opcional"
+}
+```
+
+Success 200:
+
+```json
+{
+    "ok": true,
+    "data": {
+        "id": "01KHN2Y1XYWPBEPJGB1104GDZW",
+        "phrase": "Frase actualizada.",
+        "author": "Anonimo",
+        "display_order": 1,
+        "is_enabled": true,
+        "created_at": "2026-05-11T00:00:00+00:00",
+        "updated_at": "2026-05-11T00:00:00+00:00"
+    }
+}
+```
+
+Errores relevantes:
+
+- 401: no autenticado.
+- 403 `AUTH_FORBIDDEN`: no es owner del evento.
+- 404: evento o frase no encontrada.
+- 422: validacion fallida `{ "errors": { "campo": ["mensaje"] } }`.
+
+### DELETE /v1/events/{slug}/romantic-phrases/{phrase}
+
+Elimina una frase romantica. `phrase` corresponde al `public_id` de la frase.
+
+**Auth:** Bearer JWT (owner del evento)  
+**Parametros de ruta:** `slug` — slug del evento. `phrase` — `public_id` de la frase.
+
+Success 200:
+
+```json
+{
+    "ok": true,
+    "data": null
+}
+```
+
+Errores relevantes:
+
+- 401: no autenticado.
+- 403 `AUTH_FORBIDDEN`: no es owner del evento.
+- 404: evento o frase no encontrada.
 - 404: cancion no encontrada en el evento.

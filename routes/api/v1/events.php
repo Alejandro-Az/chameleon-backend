@@ -7,8 +7,10 @@ use App\Http\Controllers\Api\V1\EventLocationController;
 use App\Http\Controllers\Api\V1\EventScheduleController;
 use App\Http\Controllers\Api\V1\GalleryController;
 use App\Http\Controllers\Api\V1\GiftController;
+use App\Http\Controllers\Api\V1\RomanticPhraseController;
 use App\Http\Controllers\Api\V1\RsvpController;
 use App\Http\Controllers\Api\V1\SongController;
+use App\Http\Controllers\Api\V1\StoryController;
 use Illuminate\Support\Facades\Route;
 
 // Rutas públicas (sin auth)
@@ -60,4 +62,14 @@ Route::middleware(['auth:api', 'user.active', 'user.verified', 'jwt.not_revoked'
     Route::delete('events/{slug}/gifts/{id}', [GiftController::class, 'destroy']);
 
     Route::delete('events/{slug}/songs/{song}', [SongController::class, 'destroy']);
+
+    Route::get('events/{slug}/romantic-phrases', [RomanticPhraseController::class, 'index']);
+    Route::post('events/{slug}/romantic-phrases', [RomanticPhraseController::class, 'store']);
+    Route::put('events/{slug}/romantic-phrases/{id}', [RomanticPhraseController::class, 'update']);
+    Route::delete('events/{slug}/romantic-phrases/{id}', [RomanticPhraseController::class, 'destroy']);
+
+    Route::get('events/{slug}/story', [StoryController::class, 'index']);
+    Route::post('events/{slug}/story', [StoryController::class, 'store']);
+    Route::put('events/{slug}/story/{id}', [StoryController::class, 'update']);
+    Route::delete('events/{slug}/story/{id}', [StoryController::class, 'destroy']);
 });
