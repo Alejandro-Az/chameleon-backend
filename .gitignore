@@ -2,6 +2,7 @@
 .github/skills/
 .ai/skills/
 .claude/agent-memory/
+.claude/settings.local.json
 .DS_Store
 .env
 .env.backup

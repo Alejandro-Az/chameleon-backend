@@ -208,6 +208,92 @@ Notas de consumo:
 - En `DELETE /events/{slug}` la API responde `200` con `data: null`.
 - Para módulos de evento, `module_key` permitido: `rsvp | gifts | songs | schedule | story | dress_code | gallery | romantic_phrases | attendance | location`.
 
+### Schedule / Itinerario
+
+Endpoints:
+- `GET /events/{slug}/schedules` (auth, owner)
+- `POST /events/{slug}/schedules` (auth, owner)
+- `PUT /events/{slug}/schedules/{id}` (auth, owner)
+- `DELETE /events/{slug}/schedules/{id}` (auth, owner)
+
+Reglas de consumo:
+- `id` en rutas corresponde al `public_id` del schedule.
+- `title` es requerido, con máximo 150 caracteres.
+- `starts_at` es requerido y se envía como `Y-m-d H:i:s`.
+- `ends_at` es opcional y debe ser mayor o igual que `starts_at`.
+- `location_label`, `location_type`, `description`, `display_order` e `is_enabled` son opcionales.
+
+Shape mínimo de item:
+
+```json
+{
+  "id": "01KHN2Y1XYWPBEPJGB1104GDZW",
+  "title": "Ceremonia",
+  "starts_at": "2026-12-15 17:00:00",
+  "ends_at": "2026-12-15 18:00:00",
+  "location_label": "Parroquia San Miguel",
+  "location_type": "ceremony",
+  "display_order": 0,
+  "is_enabled": true
+}
+```
+
+### Location / Ubicaciones
+
+Endpoints:
+- `GET /events/{slug}/locations` (auth, owner)
+- `POST /events/{slug}/locations` (auth, owner)
+- `PUT /events/{slug}/locations/{id}` (auth, owner)
+- `DELETE /events/{slug}/locations/{id}` (auth, owner)
+
+Reglas de consumo:
+- `id` en rutas corresponde al `public_id` de la ubicación.
+- `name` es requerido.
+- `maps_url` debe ser una URL válida cuando se envía.
+- `type` normalmente se usa para `ceremony`, `reception`, `cocktail` o `dinner`.
+
+Shape mínimo de item:
+
+```json
+{
+  "id": "01KHN2Y1XYWPBEPJGB1104GDZW",
+  "name": "Salón principal",
+  "address": "Av. Principal 123",
+  "maps_url": "https://maps.example.com/location",
+  "type": "reception",
+  "display_order": 0,
+  "is_enabled": true
+}
+```
+
+### Dress Code / Código de vestimenta
+
+Endpoints:
+- `GET /events/{slug}/dress-codes` (auth, owner)
+- `POST /events/{slug}/dress-codes` (auth, owner)
+- `PUT /events/{slug}/dress-codes/{id}` (auth, owner)
+- `DELETE /events/{slug}/dress-codes/{id}` (auth, owner)
+
+Reglas de consumo:
+- `id` en rutas corresponde al `public_id` del dress code.
+- `title` es requerido.
+- `description`, `examples` y `notes` son opcionales.
+- `examples` sirve para sugerencias concretas de vestimenta.
+
+Shape mínimo de item:
+
+```json
+{
+  "id": "01KHN2Y1XYWPBEPJGB1104GDZW",
+  "title": "Formal elegante",
+  "description": "Vestimenta formal para la ceremonia",
+  "examples": "Traje oscuro, vestido largo",
+  "notes": "Evitar tenis y mezclilla",
+  "display_order": 0,
+  "is_enabled": true
+}
+```
+
 ### Templates
 
 Endpoints:

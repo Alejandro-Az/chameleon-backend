@@ -2,6 +2,91 @@
 
 Todas las modificaciones importantes de este proyecto se documentan en este archivo. El formato se basa en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.5-alpha] - 2026-05-08
+
+Implementación inicial y sincronización documental del módulo `dress_code` para eventos.
+
+### Añadido
+- CRUD de códigos de vestimenta por evento:
+    - `GET /api/v1/events/{slug}/dress-codes`
+    - `POST /api/v1/events/{slug}/dress-codes`
+    - `PUT /api/v1/events/{slug}/dress-codes/{id}`
+    - `DELETE /api/v1/events/{slug}/dress-codes/{id}`
+- Capa de dominio y API para dress codes:
+    - `EventDressCode` model con relación a `Event`
+    - `EventDressCodeService`
+    - `EventDressCodeResource`
+    - `EventDressCodeController`
+- Persistencia y soporte de datos:
+    - migration `event_dress_codes`
+    - factory y seeder de `EventDressCode`
+- Cobertura de tests feature para auth, ownership y CRUD del módulo.
+
+### Cambiado
+- `CONTRACTS.md` sincronizado con el contrato público/privado de dress codes.
+- `app/Docs/V1/Events/EventsEndpoints.php` ampliado con endpoints OpenAPI de dress codes.
+- `docs/frontend-integration.md` ampliado con consumo de código de vestimenta.
+
+### Verificado
+- `php artisan test --filter=EventDressCodesTest` OK.
+
+## [0.2.4-alpha] - 2026-05-08
+
+Implementación inicial y sincronización documental del módulo `location` para eventos.
+
+### Añadido
+- CRUD de ubicaciones por evento:
+    - `GET /api/v1/events/{slug}/locations`
+    - `POST /api/v1/events/{slug}/locations`
+    - `PUT /api/v1/events/{slug}/locations/{id}`
+    - `DELETE /api/v1/events/{slug}/locations/{id}`
+- Capa de dominio y API para locations:
+    - `EventLocation` model con relación a `Event`
+    - `EventLocationService`
+    - `EventLocationResource`
+    - `EventLocationController`
+- Persistencia y soporte de datos:
+    - migration `event_locations`
+    - factory y seeder de `EventLocation`
+- Cobertura de tests feature para auth, ownership y CRUD del módulo.
+
+### Cambiado
+- `CONTRACTS.md` sincronizado con el contrato público/privado de locations.
+- `app/Docs/V1/Events/EventsEndpoints.php` ampliado con endpoints OpenAPI de locations.
+- `docs/frontend-integration.md` ampliado con consumo de ubicaciones.
+
+### Verificado
+- `php artisan test --filter=EventLocationsTest` OK.
+
+## [0.2.3-alpha] - 2026-05-08
+
+Implementación inicial y sincronización documental del módulo `schedule` para eventos.
+
+### Añadido
+- CRUD de itinerario por evento:
+    - `GET /api/v1/events/{slug}/schedules`
+    - `POST /api/v1/events/{slug}/schedules`
+    - `PUT /api/v1/events/{slug}/schedules/{id}`
+    - `DELETE /api/v1/events/{slug}/schedules/{id}`
+- Capa de dominio y API para schedules:
+    - `EventSchedule` model con relación a `Event`
+    - `EventScheduleService`
+    - `EventScheduleResource`
+    - `EventScheduleController`
+- Persistencia y soporte de datos:
+    - migration `event_schedules`
+    - factory y seeder de `EventSchedule`
+- Cobertura de tests feature para auth, ownership y CRUD del módulo.
+
+### Cambiado
+- `CONTRACTS.md` sincronizado con el contrato público/privado de schedules.
+- `app/Docs/V1/Events/EventsEndpoints.php` ampliado con endpoints OpenAPI de schedules.
+- `docs/frontend-integration.md` preparado para el consumo de itinerario del evento.
+
+### Verificado
+- `php artisan test --filter=EventSchedulesTest` OK.
+- `php artisan l5-swagger:generate` OK.
+
 ## [0.2.2-alpha] - 2026-05-08
 
 Cierre de drift documental para el módulo Camaleon (Auth + Events + Templates) y sincronización de estado de avance.
