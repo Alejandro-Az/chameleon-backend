@@ -220,9 +220,13 @@ Estado por módulo:
 
 ---
 
-### 🔲 Plan 5 — Módulos Fase 5: Contenido decorativo (PENDIENTE)
+### ✅ Plan 5 — Módulos Fase 5: Contenido decorativo (COMPLETO — 2026-05-11)
 
 Módulos: `story`, `romantic_phrases`
+
+Estado por módulo:
+- `story` ✅ implementado — 12/12 tests verdes, swagger OK (2026-05-11)
+- `romantic_phrases` ✅ implementado — 13/13 tests verdes, swagger OK (2026-05-11)
 
 **Fuente de lógica legacy:**
 - `C:\xampp\htdocs\camaleon\app\Http\Controllers\Client\StoryController.php`

@@ -75,4 +75,14 @@ class Event extends Model
     {
         return $this->hasMany(EventPhoto::class)->orderBy('display_order');
     }
+
+    public function stories(): HasMany
+    {
+        return $this->hasMany(EventStory::class)->orderBy('display_order');
+    }
+
+    public function romanticPhrases(): HasMany
+    {
+        return $this->hasMany(EventRomanticPhrase::class)->orderBy('display_order');
+    }
 }
