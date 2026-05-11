@@ -157,9 +157,14 @@ Pendiente para cierre formal de plan:
 
 ---
 
-### 🔲 Plan 2 — Módulos Fase 2: Info esencial del evento (PENDIENTE)
+### 🟡 Plan 2 — Módulos Fase 2: Info esencial del evento (EN PROGRESO)
 
 Módulos: `schedule`, `location`, `dress_code`
+
+Estado por módulo:
+- `schedule` ✅ implementado y documentado
+- `location` ✅ implementado y documentado
+- `dress_code` ✅ implementado y documentado
 
 **Fuente de lógica legacy:**
 - `C:\xampp\htdocs\camaleon\app\Http\Controllers\Client\ScheduleController.php`

@@ -233,6 +233,216 @@ Request:
 
 `module_key` permitido: `rsvp | gifts | songs | schedule | story | dress_code | gallery | romantic_phrases | attendance | location`.
 
+### GET /v1/events/{slug}/schedules
+
+Privado. Lista actividades (itinerario) del evento.
+
+Success 200:
+
+```json
+{
+	"ok": true,
+	"data": [
+		{
+			"id": "01KHN2Y1XYWPBEPJGB1104GDZW",
+			"title": "Ceremonia",
+			"description": "Ceremonia religiosa",
+			"starts_at": "2026-12-15 17:00:00",
+			"ends_at": "2026-12-15 18:00:00",
+			"location_label": "Parroquia San Miguel",
+			"location_type": "ceremony",
+			"display_order": 0,
+			"is_enabled": true
+		}
+	]
+}
+```
+
+### POST /v1/events/{slug}/schedules
+
+Privado. Crea actividad del itinerario.
+
+Request:
+
+```json
+{
+	"title": "Ceremonia",
+	"description": "Ceremonia religiosa",
+	"starts_at": "2026-12-15 17:00:00",
+	"ends_at": "2026-12-15 18:00:00",
+	"location_label": "Parroquia San Miguel",
+	"location_type": "ceremony",
+	"display_order": 0,
+	"is_enabled": true
+}
+```
+
+Reglas relevantes:
+
+- `title`: requerido, string, max 150.
+- `description`: opcional, string, max 500.
+- `starts_at`: requerido, formato `Y-m-d H:i:s`.
+- `ends_at`: opcional, formato `Y-m-d H:i:s`, debe ser >= `starts_at`.
+- `location_label`: opcional, string, max 150.
+- `location_type`: opcional, string, max 50.
+- `display_order`: opcional, integer >= 0.
+- `is_enabled`: opcional, boolean.
+
+### PUT /v1/events/{slug}/schedules/{id}
+
+Privado. Actualiza actividad del itinerario. `id` corresponde a `public_id`.
+
+Request permitido (todos opcionales): mismos campos que `POST`.
+
+### DELETE /v1/events/{slug}/schedules/{id}
+
+Privado. Elimina actividad del itinerario. `id` corresponde a `public_id`.
+
+Success 200:
+
+```json
+{
+	"ok": true,
+	"data": null
+}
+```
+
+### GET /v1/events/{slug}/locations
+
+Privado. Lista ubicaciones del evento.
+
+Success 200:
+
+```json
+{
+	"ok": true,
+	"data": [
+		{
+			"id": "01KHN2Y1XYWPBEPJGB1104GDZW",
+			"name": "Salón principal",
+			"address": "Av. Principal 123",
+			"maps_url": "https://maps.example.com/location",
+			"type": "reception",
+			"display_order": 0,
+			"is_enabled": true
+		}
+	]
+}
+```
+
+### POST /v1/events/{slug}/locations
+
+Privado. Crea ubicación del evento.
+
+Request:
+
+```json
+{
+	"name": "Salón principal",
+	"address": "Av. Principal 123",
+	"maps_url": "https://maps.example.com/location",
+	"type": "reception",
+	"display_order": 0,
+	"is_enabled": true
+}
+```
+
+Reglas relevantes:
+
+- `name`: requerido, string, max 150.
+- `address`: opcional, string, max 255.
+- `maps_url`: opcional, URL válida, max 500.
+- `type`: opcional, string, max 50.
+- `display_order`: opcional, integer >= 0.
+- `is_enabled`: opcional, boolean.
+
+### PUT /v1/events/{slug}/locations/{id}
+
+Privado. Actualiza ubicación del evento. `id` corresponde a `public_id`.
+
+Request permitido (todos opcionales): mismos campos que `POST`.
+
+### DELETE /v1/events/{slug}/locations/{id}
+
+Privado. Elimina ubicación del evento. `id` corresponde a `public_id`.
+
+Success 200:
+
+```json
+{
+	"ok": true,
+	"data": null
+}
+```
+
+### GET /v1/events/{slug}/dress-codes
+
+Privado. Lista códigos de vestimenta del evento.
+
+Success 200:
+
+```json
+{
+	"ok": true,
+	"data": [
+		{
+			"id": "01KHN2Y1XYWPBEPJGB1104GDZW",
+			"title": "Formal elegante",
+			"description": "Vestimenta formal para la ceremonia",
+			"examples": "Traje oscuro, vestido largo",
+			"notes": "Evitar tenis y mezclilla",
+			"display_order": 0,
+			"is_enabled": true
+		}
+	]
+}
+```
+
+### POST /v1/events/{slug}/dress-codes
+
+Privado. Crea código de vestimenta del evento.
+
+Request:
+
+```json
+{
+	"title": "Formal elegante",
+	"description": "Vestimenta formal para la ceremonia",
+	"examples": "Traje oscuro, vestido largo",
+	"notes": "Evitar tenis y mezclilla",
+	"display_order": 0,
+	"is_enabled": true
+}
+```
+
+Reglas relevantes:
+
+- `title`: requerido, string, max 150.
+- `description`: opcional, string, max 500.
+- `examples`: opcional, string, max 1000.
+- `notes`: opcional, string, max 1000.
+- `display_order`: opcional, integer >= 0.
+- `is_enabled`: opcional, boolean.
+
+### PUT /v1/events/{slug}/dress-codes/{id}
+
+Privado. Actualiza código de vestimenta del evento. `id` corresponde a `public_id`.
+
+Request permitido (todos opcionales): mismos campos que `POST`.
+
+### DELETE /v1/events/{slug}/dress-codes/{id}
+
+Privado. Elimina código de vestimenta del evento. `id` corresponde a `public_id`.
+
+Success 200:
+
+```json
+{
+	"ok": true,
+	"data": null
+}
+```
+
 ---
 
 ## Templates

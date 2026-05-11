@@ -17,6 +17,9 @@ final class DatabaseSeeder extends Seeder
 
         if (app()->environment('local')) {
             $this->call(DemoSeeder::class);
+            $this->call(EventScheduleSeeder::class);
+            $this->call(EventLocationSeeder::class);
+            $this->call(EventDressCodeSeeder::class);
         }
     }
 }

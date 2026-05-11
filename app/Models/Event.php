@@ -40,4 +40,19 @@ class Event extends Model
     {
         return $this->hasMany(EventModuleConfig::class)->orderBy('order');
     }
+
+    public function schedules(): HasMany
+    {
+        return $this->hasMany(EventSchedule::class)->orderBy('display_order');
+    }
+
+    public function locations(): HasMany
+    {
+        return $this->hasMany(EventLocation::class)->orderBy('display_order');
+    }
+
+    public function dressCodes(): HasMany
+    {
+        return $this->hasMany(EventDressCode::class)->orderBy('display_order');
+    }
 }
