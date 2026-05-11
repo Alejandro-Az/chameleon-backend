@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name', 200);
             $table->string('email', 200)->nullable();
             $table->string('phone', 50)->nullable();
-            $table->string('invitation_code', 100)->unique();
+            $table->string('invitation_code', 100);
             $table->unsignedSmallInteger('invited_seats')->default(1);
 
             $table->enum('rsvp_status', ['pending', 'yes', 'no', 'maybe'])->default('pending');
@@ -29,6 +29,8 @@ return new class extends Migration
 
             $table->string('seat_label', 100)->nullable();
             $table->timestamp('checked_in_at')->nullable();
+
+            $table->unique(['event_id', 'invitation_code']);
 
             $table->softDeletes();
             $table->timestamps();

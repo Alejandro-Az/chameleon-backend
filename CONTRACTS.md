@@ -572,7 +572,7 @@ Reglas relevantes:
 - `name`: requerido, string, max 200.
 - `email`: opcional, email valido, max 200.
 - `phone`: opcional, string, max 50.
-- `invitation_code`: requerido, string, max 100, unico en la tabla `guests`.
+- `invitation_code`: requerido, string, max 100, unico por evento (`event_id + invitation_code`).
 - `invited_seats`: opcional, integer, min 1, max 50.
 - `seat_label`: opcional, string, max 100.
 
@@ -666,6 +666,128 @@ Errores relevantes:
 - 403 `AUTH_FORBIDDEN`: no es owner del evento.
 - 404: invitado no encontrado en el evento.
 
+### GET /v1/events/{slug}/attendance
+
+Privado (owner del evento). Lista invitados que ya realizaron check-in.
+
+**Auth:** Bearer JWT (owner del evento)  
+**Parametros de ruta:** `slug` — slug del evento.
+
+Success 200:
+
+```json
+{
+    "ok": true,
+    "data": [
+        {
+            "id": "01KHN2Y1XYWPBEPJGB1104GDZW",
+            "name": "Ana Garcia",
+            "email": "ana@ejemplo.com",
+            "phone": "+52 55 1234 5678",
+            "invitation_code": "ANA2024",
+            "invited_seats": 2,
+            "rsvp_status": "yes",
+            "guests_confirmed": 2,
+            "rsvp_message": "Ahi estaremos!",
+            "show_in_public_list": true,
+            "dietary_tags": ["vegano"],
+            "dietary_notes": "Alergia a los cacahuates",
+            "seat_label": "Mesa 3",
+            "checked_in_at": "2026-12-15T17:05:00+00:00",
+            "created_at": "2026-05-11T00:00:00+00:00",
+            "updated_at": "2026-05-11T00:00:00+00:00"
+        }
+    ]
+}
+```
+
+Errores relevantes:
+
+- 401: no autenticado.
+- 403 `AUTH_FORBIDDEN`: no es owner del evento.
+- 404: evento no encontrado.
+
+### POST /v1/events/{slug}/attendance/{guest}
+
+Privado (owner del evento). Registra check-in de un invitado (estampa `checked_in_at` con la hora actual).
+
+**Auth:** Bearer JWT (owner del evento)  
+**Parametros de ruta:** `slug` — slug del evento. `guest` — `public_id` del invitado.  
+**Body:** ninguno.
+
+Success 200:
+
+```json
+{
+    "ok": true,
+    "data": {
+        "id": "01KHN2Y1XYWPBEPJGB1104GDZW",
+        "name": "Ana Garcia",
+        "email": "ana@ejemplo.com",
+        "phone": "+52 55 1234 5678",
+        "invitation_code": "ANA2024",
+        "invited_seats": 2,
+        "rsvp_status": "yes",
+        "guests_confirmed": 2,
+        "rsvp_message": "Ahi estaremos!",
+        "show_in_public_list": true,
+        "dietary_tags": ["vegano"],
+        "dietary_notes": "Alergia a los cacahuates",
+        "seat_label": "Mesa 3",
+        "checked_in_at": "2026-12-15T17:05:00+00:00",
+        "created_at": "2026-05-11T00:00:00+00:00",
+        "updated_at": "2026-05-11T00:00:00+00:00"
+    }
+}
+```
+
+Errores relevantes:
+
+- 401: no autenticado.
+- 403 `AUTH_FORBIDDEN`: no es owner del evento.
+- 404: invitado no encontrado en el evento.
+- 422 `ATTENDANCE_ALREADY_CHECKED_IN`: el invitado ya tiene check-in registrado.
+
+### DELETE /v1/events/{slug}/attendance/{guest}
+
+Privado (owner del evento). Revierte check-in de un invitado (limpia `checked_in_at`).
+
+**Auth:** Bearer JWT (owner del evento)  
+**Parametros de ruta:** `slug` — slug del evento. `guest` — `public_id` del invitado.
+
+Success 200:
+
+```json
+{
+    "ok": true,
+    "data": {
+        "id": "01KHN2Y1XYWPBEPJGB1104GDZW",
+        "name": "Ana Garcia",
+        "email": "ana@ejemplo.com",
+        "phone": "+52 55 1234 5678",
+        "invitation_code": "ANA2024",
+        "invited_seats": 2,
+        "rsvp_status": "yes",
+        "guests_confirmed": 2,
+        "rsvp_message": "Ahi estaremos!",
+        "show_in_public_list": true,
+        "dietary_tags": ["vegano"],
+        "dietary_notes": "Alergia a los cacahuates",
+        "seat_label": "Mesa 3",
+        "checked_in_at": null,
+        "created_at": "2026-05-11T00:00:00+00:00",
+        "updated_at": "2026-05-11T00:00:00+00:00"
+    }
+}
+```
+
+Errores relevantes:
+
+- 401: no autenticado.
+- 403 `AUTH_FORBIDDEN`: no es owner del evento.
+- 404: invitado no encontrado en el evento.
+- 422 `ATTENDANCE_NOT_CHECKED_IN`: el invitado no tiene check-in registrado.
+
 ---
 
 ## Templates
@@ -739,3 +861,382 @@ Request parcial permitido para:
 - `event_type`
 - `default_module_order`
 - `styles`
+
+---
+
+## Galería
+
+### GET /v1/events/{slug}/gallery
+
+Privado (owner del evento). Lista las fotos de la galería del evento.
+
+**Auth:** Bearer JWT (owner del evento)  
+**Parametros de ruta:** `slug` — slug del evento.
+
+Success 200:
+
+```json
+{
+    "ok": true,
+    "data": [
+        {
+            "id": "01KHN2Y1XYWPBEPJGB1104GDZW",
+            "type": "gallery",
+            "caption": "Ceremonia",
+            "status": "approved",
+            "display_order": 0,
+            "file_url": "https://example.com/storage/photos/file.jpg",
+            "thumbnail_url": "https://example.com/storage/photos/thumb.jpg",
+            "uploaded_by_guest": false,
+            "created_at": "2026-05-11T00:00:00+00:00"
+        }
+    ]
+}
+```
+
+Errores relevantes:
+
+- 401: no autenticado.
+- 403 `AUTH_FORBIDDEN`: no es owner del evento.
+- 404: evento no encontrado.
+
+### POST /v1/events/{slug}/gallery
+
+Privado (owner del evento). Sube una foto a la galería del evento.
+
+**Auth:** Bearer JWT (owner del evento)  
+**Parametros de ruta:** `slug` — slug del evento.  
+**Content-Type:** `multipart/form-data`
+
+Body:
+
+| Campo | Tipo | Reglas |
+|-------|------|--------|
+| `photo` | file (imagen) | requerido, imagen, max 4 MB |
+| `type` | string | opcional, enum: `gallery`, `hero`, `dress_code`, `story` |
+| `caption` | string | opcional, max 255 |
+| `display_order` | integer | opcional, min 0 |
+
+Success 201:
+
+```json
+{
+    "ok": true,
+    "data": {
+        "id": "01KHN2Y1XYWPBEPJGB1104GDZW",
+        "type": "gallery",
+        "caption": "Ceremonia",
+        "status": "approved",
+        "display_order": 0,
+        "file_url": "https://example.com/storage/photos/file.jpg",
+        "thumbnail_url": null,
+        "uploaded_by_guest": false,
+        "created_at": "2026-05-11T00:00:00+00:00"
+    }
+}
+```
+
+Errores relevantes:
+
+- 401: no autenticado.
+- 403 `AUTH_FORBIDDEN`: no es owner del evento.
+- 422: validacion fallida `{ "errors": { "campo": ["mensaje"] } }`.
+
+### DELETE /v1/events/{slug}/gallery/{photo}
+
+Privado (owner del evento). Elimina una foto de la galería. `photo` corresponde al `public_id` de la foto (ULID).
+
+**Auth:** Bearer JWT (owner del evento)  
+**Parametros de ruta:** `slug` — slug del evento. `photo` — `public_id` de la foto.
+
+Success 200:
+
+```json
+{
+    "ok": true,
+    "data": null
+}
+```
+
+Errores relevantes:
+
+- 401: no autenticado.
+- 403 `AUTH_FORBIDDEN`: no es owner del evento.
+- 404: foto no encontrada en el evento.
+
+---
+
+## Regalos
+
+### GET /v1/events/{slug}/gifts
+
+Privado (owner del evento). Lista los regalos del evento.
+
+**Auth:** Bearer JWT (owner del evento)  
+**Parametros de ruta:** `slug` — slug del evento.
+
+Success 200:
+
+```json
+{
+    "ok": true,
+    "data": [
+        {
+            "id": "01KHN2Y1XYWPBEPJGB1104GDZW",
+            "name": "Cafetera",
+            "description": "Cafetera espresso italiana",
+            "store_label": "Liverpool",
+            "url": "https://liverpool.com.mx/cafetera",
+            "quantity": 1,
+            "quantity_reserved": 0,
+            "available_units": 1,
+            "status": "pending",
+            "display_order": 0,
+            "created_at": "2026-05-11T00:00:00+00:00",
+            "updated_at": "2026-05-11T00:00:00+00:00"
+        }
+    ]
+}
+```
+
+Errores relevantes:
+
+- 401: no autenticado.
+- 403 `AUTH_FORBIDDEN`: no es owner del evento.
+- 404: evento no encontrado.
+
+### POST /v1/events/{slug}/gifts
+
+Privado (owner del evento). Crea un regalo en la mesa de regalos del evento.
+
+**Auth:** Bearer JWT (owner del evento)  
+**Parametros de ruta:** `slug` — slug del evento.
+
+Request:
+
+```json
+{
+    "name": "Cafetera",
+    "description": "Cafetera espresso italiana",
+    "store_label": "Liverpool",
+    "url": "https://liverpool.com.mx/cafetera",
+    "quantity": 1,
+    "display_order": 0
+}
+```
+
+Reglas relevantes:
+
+- `name`: requerido, string, max 150.
+- `description`: opcional, string, max 500.
+- `store_label`: opcional, string, max 100.
+- `url`: opcional, URL valida, max 500.
+- `quantity`: requerido, integer, min 1, max 999.
+- `display_order`: opcional, integer >= 0.
+
+Success 201:
+
+```json
+{
+    "ok": true,
+    "data": {
+        "id": "01KHN2Y1XYWPBEPJGB1104GDZW",
+        "name": "Cafetera",
+        "description": "Cafetera espresso italiana",
+        "store_label": "Liverpool",
+        "url": "https://liverpool.com.mx/cafetera",
+        "quantity": 1,
+        "quantity_reserved": 0,
+        "available_units": 1,
+        "status": "pending",
+        "display_order": 0,
+        "created_at": "2026-05-11T00:00:00+00:00",
+        "updated_at": "2026-05-11T00:00:00+00:00"
+    }
+}
+```
+
+Errores relevantes:
+
+- 401: no autenticado.
+- 403 `AUTH_FORBIDDEN`: no es owner del evento.
+- 422: validacion fallida `{ "errors": { "campo": ["mensaje"] } }`.
+
+### PUT /v1/events/{slug}/gifts/{gift}
+
+Privado (owner del evento). Actualiza un regalo. `gift` corresponde al `public_id` del regalo.
+
+**Auth:** Bearer JWT (owner del evento)  
+**Parametros de ruta:** `slug` — slug del evento. `gift` — `public_id` del regalo.
+
+Request (todos opcionales salvo los marcados):
+
+```json
+{
+    "name": "Cafetera actualizada",
+    "description": "Nueva descripcion",
+    "store_label": "Amazon",
+    "url": "https://amazon.com.mx/cafetera",
+    "quantity": 2,
+    "display_order": 1,
+    "status": "reserved"
+}
+```
+
+Reglas relevantes:
+
+- `name`: condicional (`sometimes`), string, max 150.
+- `description`: opcional, string, max 500.
+- `store_label`: opcional, string, max 100.
+- `url`: opcional, URL valida, max 500.
+- `quantity`: condicional (`sometimes`), integer, min 1, max 999.
+- `display_order`: opcional, integer >= 0.
+- `status`: opcional, enum: `pending`, `reserved`, `purchased`.
+
+Success 200: retorna el regalo actualizado con la misma forma que `POST /gifts`.
+
+Errores relevantes:
+
+- 401: no autenticado.
+- 403 `AUTH_FORBIDDEN`: no es owner del evento.
+- 404: regalo no encontrado en el evento.
+- 422: validacion fallida `{ "errors": { "campo": ["mensaje"] } }`.
+
+### DELETE /v1/events/{slug}/gifts/{gift}
+
+Privado (owner del evento). Elimina un regalo. `gift` corresponde al `public_id` del regalo.
+
+**Auth:** Bearer JWT (owner del evento)  
+**Parametros de ruta:** `slug` — slug del evento. `gift` — `public_id` del regalo.
+
+Success 200:
+
+```json
+{
+    "ok": true,
+    "data": null
+}
+```
+
+Errores relevantes:
+
+- 401: no autenticado.
+- 403 `AUTH_FORBIDDEN`: no es owner del evento.
+- 404: regalo no encontrado en el evento.
+
+---
+
+## Canciones
+
+### GET /v1/events/{slug}/songs
+
+Publico. Lista las canciones sugeridas para el evento.
+
+**Auth:** ninguna (publico)  
+**Parametros de ruta:** `slug` — slug del evento.
+
+Success 200:
+
+```json
+{
+    "ok": true,
+    "data": [
+        {
+            "id": "01KHN2Y1XYWPBEPJGB1104GDZW",
+            "title": "Perfect",
+            "artist": "Ed Sheeran",
+            "url": "https://open.spotify.com/track/...",
+            "message_for_couple": "Para el primer baile",
+            "show_author": true,
+            "suggested_by_name": "Ana Garcia",
+            "votes_count": 5,
+            "status": "approved",
+            "created_at": "2026-05-11T00:00:00+00:00"
+        }
+    ]
+}
+```
+
+Errores relevantes:
+
+- 404: evento no encontrado.
+
+### POST /v1/events/{slug}/songs
+
+Publico (invitado con codigo de invitacion). Sugiere una cancion para el evento.
+
+**Auth:** ninguna (publico) — la identidad del invitado se valida mediante `invitation_code` en el Service.  
+**Parametros de ruta:** `slug` — slug del evento.
+
+Request:
+
+```json
+{
+    "invitation_code": "ANA2024",
+    "title": "Perfect",
+    "artist": "Ed Sheeran",
+    "url": "https://open.spotify.com/track/...",
+    "message_for_couple": "Para el primer baile",
+    "show_author": true
+}
+```
+
+Reglas relevantes:
+
+- `invitation_code`: requerido, string.
+- `title`: requerido, string, max 150.
+- `artist`: opcional, string, max 150.
+- `url`: opcional, URL valida, max 255.
+- `message_for_couple`: opcional, string, max 500.
+- `show_author`: opcional, boolean.
+
+Success 201:
+
+```json
+{
+    "ok": true,
+    "data": {
+        "id": "01KHN2Y1XYWPBEPJGB1104GDZW",
+        "title": "Perfect",
+        "artist": "Ed Sheeran",
+        "url": "https://open.spotify.com/track/...",
+        "message_for_couple": "Para el primer baile",
+        "show_author": true,
+        "suggested_by_name": "Ana Garcia",
+        "votes_count": 0,
+        "status": "approved",
+        "created_at": "2026-05-11T00:00:00+00:00"
+    }
+}
+```
+
+> `status` depende de la configuracion del evento: `approved` si `auto_approve=true` (default), `pending` si `auto_approve=false` (el master debe aprobar antes de que aparezca en la lista publica).
+
+Errores relevantes:
+
+- 404: evento no encontrado.
+- 422 `INVALID_INVITATION`: no se pudo identificar la invitacion con el codigo proporcionado.
+- 422 `DUPLICATE_SONG`: esa cancion ya esta en la lista del evento.
+- 422: validacion fallida `{ "errors": { "campo": ["mensaje"] } }`.
+
+### DELETE /v1/events/{slug}/songs/{song}
+
+Privado (owner del evento). Elimina una cancion sugerida. `song` corresponde al `public_id` de la cancion.
+
+**Auth:** Bearer JWT (owner del evento)  
+**Parametros de ruta:** `slug` — slug del evento. `song` — `public_id` de la cancion.
+
+Success 200:
+
+```json
+{
+    "ok": true,
+    "data": null
+}
+```
+
+Errores relevantes:
+
+- 401: no autenticado.
+- 403 `AUTH_FORBIDDEN`: no es owner del evento.
+- 404: cancion no encontrada en el evento.

@@ -20,6 +20,7 @@ final class DatabaseSeeder extends Seeder
             $this->call(EventScheduleSeeder::class);
             $this->call(EventLocationSeeder::class);
             $this->call(EventDressCodeSeeder::class);
+            $this->call(GiftSeeder::class);
         }
     }
 }

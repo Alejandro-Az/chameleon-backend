@@ -5797,6 +5797,713 @@
                 ]
             }
         },
+        "/api/v1/events/{slug}/gifts": {
+            "get": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Listar regalos del evento",
+                "operationId": "ef25e2086ae6fe76dcc7e3a81fbbc771",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "boda-ana-y-luis"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string",
+                                                        "example": "01KHN2Y1XYWPBEPJGB1104GDZW"
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "example": "Vajilla de porcelana"
+                                                    },
+                                                    "description": {
+                                                        "type": "string",
+                                                        "example": "Juego completo para 8 personas",
+                                                        "nullable": true
+                                                    },
+                                                    "store_label": {
+                                                        "type": "string",
+                                                        "example": "Liverpool",
+                                                        "nullable": true
+                                                    },
+                                                    "url": {
+                                                        "type": "string",
+                                                        "example": "https://liverpool.com.mx/vajilla",
+                                                        "nullable": true
+                                                    },
+                                                    "quantity": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "quantity_reserved": {
+                                                        "type": "integer",
+                                                        "example": 0
+                                                    },
+                                                    "available_units": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "enum": [
+                                                            "pending",
+                                                            "reserved",
+                                                            "purchased"
+                                                        ],
+                                                        "example": "pending"
+                                                    },
+                                                    "display_order": {
+                                                        "type": "integer",
+                                                        "example": 0
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Crear regalo en el evento",
+                "operationId": "64728910f43824fea107e54e2f03aa39",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "boda-ana-y-luis"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "quantity"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 150,
+                                        "example": "Vajilla de porcelana"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "maxLength": 500,
+                                        "example": "Juego completo para 8 personas",
+                                        "nullable": true
+                                    },
+                                    "store_label": {
+                                        "type": "string",
+                                        "maxLength": 100,
+                                        "example": "Liverpool",
+                                        "nullable": true
+                                    },
+                                    "url": {
+                                        "type": "string",
+                                        "maxLength": 500,
+                                        "example": "https://liverpool.com.mx/vajilla",
+                                        "nullable": true
+                                    },
+                                    "quantity": {
+                                        "type": "integer",
+                                        "maximum": 999,
+                                        "minimum": 1,
+                                        "example": 1
+                                    },
+                                    "display_order": {
+                                        "type": "integer",
+                                        "example": 0,
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "422": {
+                        "description": "Validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/events/{slug}/gifts/{id}": {
+            "put": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Actualizar regalo del evento",
+                "operationId": "150e867fdc065ee0921456c783fcf4ec",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "boda-ana-y-luis"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "01KHN2Y1XYWPBEPJGB1104GDZW"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 150,
+                                        "example": "Vajilla actualizada",
+                                        "nullable": true
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "maxLength": 500,
+                                        "example": "Descripción actualizada",
+                                        "nullable": true
+                                    },
+                                    "store_label": {
+                                        "type": "string",
+                                        "maxLength": 100,
+                                        "example": "El Palacio de Hierro",
+                                        "nullable": true
+                                    },
+                                    "url": {
+                                        "type": "string",
+                                        "maxLength": 500,
+                                        "example": "https://elpalaciodehierro.com/vajilla",
+                                        "nullable": true
+                                    },
+                                    "quantity": {
+                                        "type": "integer",
+                                        "maximum": 999,
+                                        "minimum": 1,
+                                        "example": 2,
+                                        "nullable": true
+                                    },
+                                    "display_order": {
+                                        "type": "integer",
+                                        "example": 1,
+                                        "nullable": true
+                                    },
+                                    "status": {
+                                        "type": "string",
+                                        "enum": [
+                                            "pending",
+                                            "reserved",
+                                            "purchased"
+                                        ],
+                                        "example": "reserved",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "422": {
+                        "description": "Validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Eliminar regalo del evento",
+                "operationId": "3a0a36ee3b35310ff5027d07cf65e17f",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "boda-ana-y-luis"
+                        }
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "01KHN2Y1XYWPBEPJGB1104GDZW"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/events/{slug}/songs": {
+            "get": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Listar canciones sugeridas del evento (público)",
+                "operationId": "46982228798b50d566c42896d68bfc43",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "boda-ana-y-luis"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "ok": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "string",
+                                                        "example": "01KHN2Y1XYWPBEPJGB1104GDZW"
+                                                    },
+                                                    "title": {
+                                                        "type": "string",
+                                                        "example": "Perfect"
+                                                    },
+                                                    "artist": {
+                                                        "type": "string",
+                                                        "example": "Ed Sheeran",
+                                                        "nullable": true
+                                                    },
+                                                    "url": {
+                                                        "type": "string",
+                                                        "example": "https://open.spotify.com/track/...",
+                                                        "nullable": true
+                                                    },
+                                                    "message_for_couple": {
+                                                        "type": "string",
+                                                        "example": "Para el primer baile",
+                                                        "nullable": true
+                                                    },
+                                                    "show_author": {
+                                                        "type": "boolean",
+                                                        "example": true
+                                                    },
+                                                    "suggested_by_name": {
+                                                        "type": "string",
+                                                        "example": "María García",
+                                                        "nullable": true
+                                                    },
+                                                    "votes_count": {
+                                                        "type": "integer",
+                                                        "example": 5
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "example": "approved"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Evento no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Sugerir una canción para el evento (público)",
+                "operationId": "8beb52bb49efb0f5af61d0010b0bd9d0",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "boda-ana-y-luis"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "invitation_code",
+                                    "title"
+                                ],
+                                "properties": {
+                                    "invitation_code": {
+                                        "type": "string",
+                                        "example": "DEMO1234"
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "maxLength": 150,
+                                        "example": "Perfect"
+                                    },
+                                    "artist": {
+                                        "type": "string",
+                                        "maxLength": 150,
+                                        "example": "Ed Sheeran",
+                                        "nullable": true
+                                    },
+                                    "url": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "https://open.spotify.com/track/...",
+                                        "nullable": true
+                                    },
+                                    "message_for_couple": {
+                                        "type": "string",
+                                        "maxLength": 500,
+                                        "example": "Para el primer baile",
+                                        "nullable": true
+                                    },
+                                    "show_author": {
+                                        "type": "boolean",
+                                        "example": true,
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Canción sugerida correctamente"
+                    },
+                    "422": {
+                        "description": "Validación / invitación inválida / canción duplicada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Evento no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/events/{slug}/songs/{song}": {
+            "delete": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Eliminar canción del evento (master/admin)",
+                "operationId": "3f9e4883b4f3013f9077347bc6fd4862",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "boda-ana-y-luis"
+                        }
+                    },
+                    {
+                        "name": "song",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "01KHN2Y1XYWPBEPJGB1104GDZW"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "401": {
+                        "description": "No autenticado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Sin permiso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/v1/health": {
             "get": {
                 "tags": [
