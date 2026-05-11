@@ -5,12 +5,17 @@ use App\Http\Controllers\Api\V1\EventController;
 use App\Http\Controllers\Api\V1\EventDressCodeController;
 use App\Http\Controllers\Api\V1\EventLocationController;
 use App\Http\Controllers\Api\V1\EventScheduleController;
+use App\Http\Controllers\Api\V1\GalleryController;
+use App\Http\Controllers\Api\V1\GiftController;
 use App\Http\Controllers\Api\V1\RsvpController;
+use App\Http\Controllers\Api\V1\SongController;
 use Illuminate\Support\Facades\Route;
 
 // Rutas públicas (sin auth)
 Route::get('events/{slug}', [EventController::class, 'show']);
 Route::post('events/{slug}/rsvp', [RsvpController::class, 'submit']);
+Route::get('events/{slug}/songs', [SongController::class, 'index']);
+Route::post('events/{slug}/songs', [SongController::class, 'store']);
 
 // Rutas del master (requieren auth)
 Route::middleware(['auth:api', 'user.active', 'user.verified', 'jwt.not_revoked'])->group(function () {
@@ -44,4 +49,15 @@ Route::middleware(['auth:api', 'user.active', 'user.verified', 'jwt.not_revoked'
     Route::get('events/{slug}/attendance', [AttendanceController::class, 'index']);
     Route::post('events/{slug}/attendance/{guest}', [AttendanceController::class, 'store']);
     Route::delete('events/{slug}/attendance/{guest}', [AttendanceController::class, 'destroy']);
+
+    Route::get('events/{slug}/gallery', [GalleryController::class, 'index']);
+    Route::post('events/{slug}/gallery', [GalleryController::class, 'store']);
+    Route::delete('events/{slug}/gallery/{photo}', [GalleryController::class, 'destroy']);
+
+    Route::get('events/{slug}/gifts', [GiftController::class, 'index']);
+    Route::post('events/{slug}/gifts', [GiftController::class, 'store']);
+    Route::put('events/{slug}/gifts/{id}', [GiftController::class, 'update']);
+    Route::delete('events/{slug}/gifts/{id}', [GiftController::class, 'destroy']);
+
+    Route::delete('events/{slug}/songs/{song}', [SongController::class, 'destroy']);
 });

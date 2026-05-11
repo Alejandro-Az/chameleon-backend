@@ -60,4 +60,19 @@ class Event extends Model
     {
         return $this->hasMany(Guest::class);
     }
+
+    public function gifts(): HasMany
+    {
+        return $this->hasMany(Gift::class)->orderBy('display_order');
+    }
+
+    public function songs(): HasMany
+    {
+        return $this->hasMany(EventSong::class)->orderByDesc('votes_count');
+    }
+
+    public function photos(): HasMany
+    {
+        return $this->hasMany(EventPhoto::class)->orderBy('display_order');
+    }
 }
